@@ -79,7 +79,7 @@
                 <div class="mt-4 space-y-3">
                     @foreach($data['top_titles'] as $title)
                         <div>
-                            <div class="flex justify-between gap-3 text-xs"><span class="truncate" title="{{ $title['title'] }}">{{ $title['title'] }}</span><strong>{{ $title['units'] }}</strong></div>
+                            <div class="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 text-xs"><span class="editorial-title" title="{{ $title['title'] }}">{{ $title['title'] }}</span><strong class="editorial-metric">{{ $title['units'] }}</strong></div>
                             <div class="mt-1 h-2 overflow-hidden rounded bg-gray-100 dark:bg-gray-800"><div class="h-full rounded bg-violet-500" style="width: {{ $maxTitleUnits > 0 ? $title['units'] / $maxTitleUnits * 100 : 0 }}%"></div></div>
                         </div>
                     @endforeach
@@ -91,7 +91,7 @@
                 <div class="mt-4 space-y-3">
                     @forelse($data['kenp_titles'] as $title)
                         <div>
-                            <div class="flex justify-between gap-3 text-xs"><span class="truncate" title="{{ $title['title'] }}">{{ $title['title'] }}</span><strong>{{ number_format($title['pages']) }}</strong></div>
+                            <div class="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 text-xs"><span class="editorial-title" title="{{ $title['title'] }}">{{ $title['title'] }}</span><strong class="editorial-metric">{{ number_format($title['pages']) }}</strong></div>
                             <div class="mt-1 h-2 overflow-hidden rounded bg-gray-100 dark:bg-gray-800"><div class="h-full rounded bg-sky-500" style="width: {{ $maxKenp > 0 ? $title['pages'] / $maxKenp * 100 : 0 }}%"></div></div>
                         </div>
                     @empty

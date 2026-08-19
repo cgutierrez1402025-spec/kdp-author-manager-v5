@@ -5,12 +5,15 @@ namespace Tests\Feature;
 use App\Filament\Admin\Pages\Dashboard;
 use App\Filament\Admin\Widgets\ActivePromotionsWidget;
 use App\Filament\Admin\Widgets\ExpiringKdpSelectWidget;
+use App\Filament\Admin\Widgets\KdpImportedDataWidget;
 use App\Filament\Admin\Widgets\MyTasksWidget;
 use App\Filament\Admin\Widgets\RevenueChartWidget;
 use App\Filament\Admin\Widgets\SummaryCardsWidget;
 use App\Filament\Admin\Widgets\TopWorksByRevenueWidget;
 use App\Filament\Admin\Widgets\UpcomingEventsWidget;
+use App\Models\KdpReportRow;
 use App\Models\User;
+use App\Models\Work;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -55,5 +58,23 @@ class DashboardDemoDataTest extends TestCase
         ] as $widget) {
             $this->assertSame(1, app($widget)->getColumnSpan());
         }
+    }
+
+    public function test_dashboard_renders_long_work_and_publication_titles_without_truncating_them(): void
+    {
+        $this->seed();
+        $admin = User::where('email', 'admin@kdpmanager.local')->firstOrFail();
+        $this->actingAs($admin);
+        $longWorkTitle = 'Una obra con un título extraordinariamente largo que debe poder leerse completo en varias líneas dentro del panel';
+        $longPublicationTitle = 'Una publicación importada desde Amazon KDP cuyo título completo no debe quedar oculto mediante puntos suspensivos';
+        Work::where('slug', 'demo-obra-20')->update(['title_public' => $longWorkTitle]);
+        KdpReportRow::query()->firstOrFail()->update(['title' => $longPublicationTitle]);
+
+        Livewire::test(TopWorksByRevenueWidget::class)
+            ->assertSee($longWorkTitle)
+            ->assertSee('editorial-title', false);
+        Livewire::test(KdpImportedDataWidget::class)
+            ->assertSee($longPublicationTitle)
+            ->assertDontSee('class="truncate"', false);
     }
 }

@@ -5,9 +5,9 @@
     @else
         <ol class="space-y-2">
             @foreach($works as $work)
-                <li class="flex justify-between text-sm">
-                    <span class="text-gray-900 dark:text-white">{{ $work['title'] }}</span>
-                    <span class="font-medium text-amber-600">{{ number_format($work['revenue'], 2) }} €</span>
+                <li class="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4 text-sm">
+                    <span class="editorial-title">{{ $work['title'] }}</span>
+                    <span class="editorial-metric font-medium text-amber-600">{{ number_format($work['revenue'], 2) }} €</span>
                 </li>
             @endforeach
         </ol>

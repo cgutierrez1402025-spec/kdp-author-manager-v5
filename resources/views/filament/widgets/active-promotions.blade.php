@@ -6,15 +6,15 @@
     @else
         @foreach($promotions as $promotion)
             <div class="rounded-xl border border-gray-200 p-3 dark:border-white/10">
-                <div class="flex items-start justify-between">
-                    <div>
-                        <h4 class="font-medium text-gray-900 dark:text-white">
+                <div class="flex items-start justify-between gap-4">
+                    <div class="min-w-0 flex-1">
+                        <h4 class="editorial-title font-medium">
                             {{ $promotion['promotion_name'] ?? 'Untitled' }}
                         </h4>
-                        <p class="text-sm text-gray-500">{{ $promotion['work_title'] ?? 'N/A' }}</p>
+                        <p class="editorial-title text-sm text-gray-500 dark:text-gray-400">{{ $promotion['work_title'] ?? 'N/A' }}</p>
                         <p class="text-xs text-gray-400">{{ $promotion['marketplace'] ?? 'N/A' }}</p>
                     </div>
-                    <div class="text-right">
+                    <div class="editorial-metric">
                         <span class="text-sm font-semibold {{ $promotion['roi'] >= 0 ? 'text-green-600' : 'text-red-600' }}">
                             {{ $promotion['roi'] }}% ROI
                         </span>

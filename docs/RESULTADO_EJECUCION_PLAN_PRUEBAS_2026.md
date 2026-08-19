@@ -4,7 +4,7 @@ Fecha: 19 de agosto de 2026.
 
 ## Resultado general
 
-- 91 pruebas superadas y 622 aserciones correctas.
+- 92 pruebas superadas y 626 aserciones correctas.
 - PHPStan sin errores.
 - Pint sin desviaciones.
 - Build Vite de producción correcto.
@@ -13,6 +13,7 @@ Fecha: 19 de agosto de 2026.
 - Cero sesiones KDP fallidas, lotes fallidos y trabajos de cola fallidos.
 - Interfaz disponible en `http://127.0.0.1:8020/admin/login`.
 - Login, redirección del panel, CSS y JavaScript responden correctamente.
+- Los títulos largos de obras y publicaciones se muestran completos en varias líneas sin comprimir las cifras laterales.
 
 ## Auditoría de datos KDP
 

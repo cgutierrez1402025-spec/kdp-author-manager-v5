@@ -6,7 +6,7 @@
         <div class="space-y-2">
             @foreach($expiring_periods as $period)
                 <div class="text-sm">
-                    <span class="font-medium text-gray-900 dark:text-white">{{ $period['work_title'] }}</span>
+                    <span class="editorial-title block font-medium">{{ $period['work_title'] }}</span>
                     <div class="text-xs text-gray-500">
                         Vence: {{ $period['end_date'] }} ({{ $period['remaining_days'] }} días)
                         - {{ $period['free_days_remaining'] }} días gratis restantes
