@@ -33,7 +33,7 @@ class KdpReportTypeDetector
         return [
             'type' => $score > 0 ? $type : null,
             'confidence' => $maximum ? round(($score / $maximum) * 100, 2) : 0,
-            'period' => $this->period(basename($path)),
+            'period' => $this->periodFromFilename(basename($path)),
             'sheets' => array_keys($tables),
         ];
     }
@@ -64,7 +64,7 @@ class KdpReportTypeDetector
         return ['CSV' => $rows];
     }
 
-    private function period(string $filename): ?string
+    public function periodFromFilename(string $filename): ?string
     {
         if (preg_match('/(20\d{2})[-_. ]?(0[1-9]|1[0-2])/', $filename, $matches)) {
             return Carbon::create((int) $matches[1], (int) $matches[2], 1)->toDateString();

@@ -6,13 +6,17 @@ use App\Filament\Admin\Resources\ImportBatches\Pages\CreateImportBatch;
 use App\Filament\Admin\Resources\ImportBatches\Pages\ListImportBatches;
 use App\Models\ImportBatch;
 use App\Services\Kdp\KdpReportImportService;
+use App\Services\Kdp\KdpReportTypeDetector;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Str;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Throwable;
 
 class ImportBatchResource extends Resource
@@ -35,7 +39,7 @@ class ImportBatchResource extends Resource
     {
         return $form->schema([
             Forms\Components\Section::make('Informe de Amazon KDP')
-                ->description('Descarga el informe desde kdpreports.amazon.com y súbelo sin modificarlo. Se admiten CSV y XLSX.')
+                ->description('Selecciona varios CSV/XLSX o un ZIP. La aplicación detectará individualmente el tipo y el periodo de cada informe.')
                 ->schema([
                     Forms\Components\Select::make('import_type')
                         ->label('Tipo de informe')
@@ -49,18 +53,19 @@ class ImportBatchResource extends Resource
                             'historical' => 'Histórico',
                         ])
                         ->default('auto')
+                        ->helperText('Con varios archivos, cada uno se clasifica por sus cabeceras y hojas.')
                         ->required()
                         ->native(false),
                     Forms\Components\DatePicker::make('report_period')
                         ->label('Mes del informe')
-                        ->helperText('Selecciona cualquier día del mes; se guardará el primer día. Es necesario para identificar reimportaciones.')
-                        ->helperText('Opcional: se usa como periodo común cuando no aparece en el nombre del archivo.')
+                        ->helperText('Se rellena desde el nombre si todos los archivos indican el mismo mes. Sólo actúa como respaldo; cada archivo conserva su periodo detectado.')
                         ->displayFormat('m/Y'),
                     Forms\Components\FileUpload::make('original_file_paths')
                         ->label('Informes descargados de KDP')
                         ->disk('local')
                         ->directory('private/kdp-imports')
                         ->visibility('private')
+                        ->getUploadedFileNameForStorageUsing(fn (TemporaryUploadedFile $file): string => (string) Str::uuid().'-'.Str::of($file->getClientOriginalName())->replaceMatches('/[^A-Za-z0-9._-]/', '_'))
                         ->acceptedFileTypes([
                             'text/csv', 'text/plain',
                             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -70,6 +75,18 @@ class ImportBatchResource extends Resource
                         ->multiple()
                         ->maxFiles(20)
                         ->reorderable()
+                        ->live()
+                        ->afterStateUpdated(function ($state, Set $set): void {
+                            $periods = collect((array) $state)
+                                ->map(fn ($path) => app(KdpReportTypeDetector::class)->periodFromFilename(basename((string) $path)))
+                                ->filter()->unique()->values();
+
+                            if ($periods->count() === 1) {
+                                $set('report_period', $periods->first());
+                            } elseif ($periods->count() > 1) {
+                                $set('report_period', null);
+                            }
+                        })
                         ->required()
                         ->columnSpanFull(),
                     Forms\Components\Textarea::make('notes')

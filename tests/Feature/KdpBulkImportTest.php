@@ -27,6 +27,25 @@ class KdpBulkImportTest extends TestCase
         $this->assertSame('payments', $result['type']);
         $this->assertSame('2026-07-01', $result['period']);
         $this->assertSame(100.0, $result['confidence']);
+        $this->assertSame('2026-08-01', app(KdpReportTypeDetector::class)->periodFromFilename('Payments_08-2026.csv'));
+    }
+
+    public function test_each_file_keeps_its_own_month_when_multiple_months_are_uploaded(): void
+    {
+        Storage::fake('local');
+        $user = User::factory()->create();
+        $this->actingAs($user);
+        $contents = "Payment Number,Payment Date,Payment Amount,Payment Status\n%s,2026-07-30,10.00,Paid";
+        Storage::disk('local')->put('private/kdp-imports/payments-2026-06.csv', sprintf($contents, 'P-JUNE'));
+        Storage::disk('local')->put('private/kdp-imports/payments-2026-07.csv', sprintf($contents, 'P-JULY'));
+
+        $session = app(KdpBulkImportService::class)->import([
+            'private/kdp-imports/payments-2026-06.csv',
+            'private/kdp-imports/payments-2026-07.csv',
+        ], $user->id, '2025-01-01');
+
+        $this->assertEqualsCanonicalizing(['2026-06-01', '2026-07-01'], $session->batches->pluck('report_period')->map->toDateString()->all());
+        $this->assertEqualsCanonicalizing(['2026-06-01', '2026-07-01'], $session->batches->pluck('detected_report_period')->map->toDateString()->all());
     }
 
     public function test_imports_multiple_different_reports_in_one_session(): void

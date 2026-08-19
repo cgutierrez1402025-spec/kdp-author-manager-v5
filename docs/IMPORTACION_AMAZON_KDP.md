@@ -29,6 +29,8 @@ La interfaz admite hasta 20 archivos CSV/XLSX de 20 MB cada uno o ZIP de hasta 1
 5. Consulta **Publicaciones → Sesiones de importación** para ver archivos completados, duplicados, fallidos y filas nuevas.
 6. Usa **Ver archivos** para revisar cada lote y reprocesar únicamente el necesario.
 
+El mes se reconoce en nombres con patrones `AAAA-MM` y `MM-AAAA`, admitiendo guion, punto, espacio o guion bajo. Si todos los archivos seleccionados contienen el mismo mes, el formulario rellena **Mes del informe**. Si contienen meses diferentes, el campo común queda vacío y cada lote utiliza su propio periodo detectado.
+
 ## Campos normalizados
 
 Se almacenan, cuando existen:
