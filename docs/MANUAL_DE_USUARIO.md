@@ -57,11 +57,11 @@ Los periodos KDP Select permiten registrar inicio, fin, renovación y días de p
 
 1. En KDP Reports, aplica los filtros deseados y descarga el informe.
 2. En la aplicación, abre **Publicaciones → Importar informes KDP**.
-3. Pulsa **Cargar informe KDP**.
-4. Selecciona tipo, mes del informe y archivo CSV/XLSX.
+3. Pulsa **Cargar informe KDP**, selecciona hasta 20 CSV/XLSX simultáneamente o un ZIP y deja activada la detección automática.
+4. Indica un periodo sólo como respaldo si los nombres no lo contienen.
 5. Guarda y espera la notificación de resultado.
-6. Revisa filas importadas, duplicadas y erróneas.
-7. Regresa al panel para ver los gráficos.
+6. Consulta **Sesiones de importación** para revisar archivos completados, duplicados y fallidos, y abre sus lotes si necesitas reprocesarlos.
+7. Regresa al panel para ver los gráficos actualizados.
 
 Cada título nuevo aparece automáticamente en **Publicaciones → Catálogo detectado KDP**. El estado `Pendiente de revisión` significa que KDP aportó información comercial, pero todavía no existe una obra/publicación interna con coincidencia fiable. `Vinculada` significa que ASIN y formato enlazaron con el catálogo editorial.
 

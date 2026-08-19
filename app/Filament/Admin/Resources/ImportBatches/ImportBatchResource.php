@@ -40,6 +40,7 @@ class ImportBatchResource extends Resource
                     Forms\Components\Select::make('import_type')
                         ->label('Tipo de informe')
                         ->options([
+                            'auto' => 'Detectar automáticamente',
                             'prior_royalties' => 'Regalías de meses anteriores',
                             'sales_royalties' => 'Ventas y regalías',
                             'orders' => 'Pedidos',
@@ -47,23 +48,28 @@ class ImportBatchResource extends Resource
                             'payments' => 'Pagos',
                             'historical' => 'Histórico',
                         ])
+                        ->default('auto')
                         ->required()
                         ->native(false),
                     Forms\Components\DatePicker::make('report_period')
                         ->label('Mes del informe')
                         ->helperText('Selecciona cualquier día del mes; se guardará el primer día. Es necesario para identificar reimportaciones.')
-                        ->required()
+                        ->helperText('Opcional: se usa como periodo común cuando no aparece en el nombre del archivo.')
                         ->displayFormat('m/Y'),
-                    Forms\Components\FileUpload::make('original_file_path')
-                        ->label('Archivo descargado de KDP')
+                    Forms\Components\FileUpload::make('original_file_paths')
+                        ->label('Informes descargados de KDP')
                         ->disk('local')
                         ->directory('private/kdp-imports')
                         ->visibility('private')
                         ->acceptedFileTypes([
                             'text/csv', 'text/plain',
                             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                            'application/zip', 'application/x-zip-compressed',
                         ])
-                        ->maxSize(20 * 1024)
+                        ->maxSize(100 * 1024)
+                        ->multiple()
+                        ->maxFiles(20)
+                        ->reorderable()
                         ->required()
                         ->columnSpanFull(),
                     Forms\Components\Textarea::make('notes')
@@ -79,6 +85,7 @@ class ImportBatchResource extends Resource
         return $table
             ->defaultSort('created_at', 'desc')
             ->columns([
+                Tables\Columns\TextColumn::make('import_session_id')->label('Sesión')->formatStateUsing(fn ($state) => $state ? '#'.$state : 'Individual')->badge(),
                 Tables\Columns\TextColumn::make('original_file_name')->label('Archivo')->searchable(),
                 Tables\Columns\TextColumn::make('import_type')->label('Informe')->formatStateUsing(fn (string $state) => match ($state) {
                     'prior_royalties' => 'Regalías anteriores',
@@ -87,6 +94,7 @@ class ImportBatchResource extends Resource
                     'kenp' => 'KENP',
                     'payments' => 'Pagos',
                     'historical' => 'Histórico',
+                    'unknown' => 'Pendiente de revisión',
                     default => $state,
                 }),
                 Tables\Columns\TextColumn::make('report_period')->label('Periodo')->date('m/Y')->sortable(),
@@ -94,6 +102,7 @@ class ImportBatchResource extends Resource
                     'completed' => 'success',
                     'failed' => 'danger',
                     'processing' => 'warning',
+                    'needs_review' => 'warning',
                     default => 'gray',
                 }),
                 Tables\Columns\TextColumn::make('imported_rows')->label('Importadas')->numeric(),
@@ -124,6 +133,9 @@ class ImportBatchResource extends Resource
                                 ->send();
                         }
                     }),
+            ])
+            ->filters([
+                Tables\Filters\SelectFilter::make('import_session_id')->label('Sesión')->relationship('importSession', 'id'),
             ])
             ->emptyStateHeading('Todavía no hay informes KDP')
             ->emptyStateDescription('Carga un CSV o XLSX descargado de Amazon KDP para llenar las tablas de análisis.');

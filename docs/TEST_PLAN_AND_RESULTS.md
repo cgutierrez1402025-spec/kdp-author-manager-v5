@@ -16,6 +16,7 @@ Fecha: 19 de agosto de 2026
 10. Servicio de IA con proveedor simulado y ausencia controlada de credenciales.
 11. Sintaxis PHP, validez de Composer y compilación Vite de producción.
 12. Audiolibros: trazabilidad de obra a regalía, acceso Filament, transición a publicación, QA y consentimiento de réplica de voz.
+13. Importación múltiple KDP: detección de tipo/periodo, varios informes, ZIP seguro, duplicados, aislamiento de fallos y autorización.
 
 ## Errores corregidos
 
@@ -30,9 +31,9 @@ Fecha: 19 de agosto de 2026
 
 ## Resultado final
 
-- 67 pruebas superadas.
-- 516 aserciones correctas.
-- 21 listados y 21 formularios de edición probados con datos sembrados.
+- 73 pruebas superadas.
+- 540 aserciones correctas.
+- 22 listados y 21 formularios de edición probados con datos sembrados.
 - 105 relaciones Eloquent resueltas correctamente.
 - Migración limpia y seeders correctos.
 - Ninguna violación de claves foráneas.

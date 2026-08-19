@@ -11,6 +11,7 @@ use App\Filament\Admin\Resources\Checklists\ChecklistResource;
 use App\Filament\Admin\Resources\EventBooks\EventBookResource;
 use App\Filament\Admin\Resources\IllustrationAnchors\IllustrationAnchorResource;
 use App\Filament\Admin\Resources\ImportBatches\ImportBatchResource;
+use App\Filament\Admin\Resources\ImportSessions\ImportSessionResource;
 use App\Filament\Admin\Resources\KdpCatalogItems\KdpCatalogItemResource;
 use App\Filament\Admin\Resources\KdpMetadatas\KdpMetadataResource;
 use App\Filament\Admin\Resources\KdpSelectPeriods\KdpSelectPeriodResource;
@@ -87,6 +88,7 @@ class AdminPanelProvider extends PanelProvider
                 EventBookResource::class,
                 IllustrationAnchorResource::class,
                 ImportBatchResource::class,
+                ImportSessionResource::class,
                 KdpMetadataResource::class,
                 KdpCatalogItemResource::class,
                 KdpSelectPeriodResource::class,

@@ -10,6 +10,7 @@
 - [`PRUEBAS_Y_RESOLUCION_DE_PROBLEMAS.md`](PRUEBAS_Y_RESOLUCION_DE_PROBLEMAS.md): validación y diagnóstico.
 - [`INFORME_PANEL_DECISIONES_KDP_IA.md`](INFORME_PANEL_DECISIONES_KDP_IA.md): informe y hoja de ruta que originan la v5.
 - [`EVALUACION_INFORMES_KDP_Y_MODELO_DE_DATOS.md`](EVALUACION_INFORMES_KDP_Y_MODELO_DE_DATOS.md): matriz de informes, duplicados, campos vacíos y decisión sobre nuevas tablas.
+- [`RESULTADO_IMPORTACION_MULTIPLE_KDP.md`](RESULTADO_IMPORTACION_MULTIPLE_KDP.md): sesiones, detección automática, ZIP, seguridad y pruebas de la carga múltiple.
 - [`AUDITORIA_PAGOS_KDP.md`](AUDITORIA_PAGOS_KDP.md): limitaciones de pagos y diseño de conciliación pago‑obra.
 - [`INFORME_INTEGRACION_AUDIOLIBROS.md`](INFORME_INTEGRACION_AUDIOLIBROS.md): opciones KDP/ACX y cambios completos del dominio.
 - [`ENUNCIADO_ESTUDIANTES_MODULO_AUDIOLIBROS.md`](ENUNCIADO_ESTUDIANTES_MODULO_AUDIOLIBROS.md): proyecto evaluable para diseñar e implementar el módulo.

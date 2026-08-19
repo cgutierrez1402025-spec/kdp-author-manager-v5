@@ -204,10 +204,16 @@ class ComprehensiveDemoSeeder extends Seeder
                 'alt_text' => 'Imagen promocional de la obra', 'status' => 'ready',
             ]);
 
+            $importSession = $this->record('import_sessions', ['user_id' => $author, 'notes' => 'Sesión múltiple de demostración'], [
+                'status' => 'completed', 'total_files' => 1, 'completed_files' => 1, 'imported_rows' => 1,
+                'started_at' => now()->subHour(), 'finished_at' => now(),
+            ]);
             $batch = $this->record('import_batches', ['file_hash' => hash('sha256', 'demo-import-royalties-2026')], [
-                'user_id' => $author, 'import_type' => 'prior_royalties', 'report_period' => '2026-01-01', 'source_system' => 'Amazon KDP',
+                'import_session_id' => $importSession, 'user_id' => $author, 'import_type' => 'prior_royalties',
+                'detected_import_type' => 'prior_royalties', 'detection_confidence' => 100,
+                'report_period' => '2026-01-01', 'detected_report_period' => '2026-01-01', 'source_system' => 'Amazon KDP',
                 'original_file_path' => 'demo/imports/royalties-2026.csv', 'original_file_name' => 'royalties-2026.csv',
-                'detected_format' => 'csv', 'status' => 'completed', 'started_at' => now()->subHour(), 'finished_at' => now(),
+                'detected_format' => 'csv', 'processing_order' => 1, 'status' => 'completed', 'started_at' => now()->subHour(), 'finished_at' => now(),
                 'total_rows' => 1, 'imported_rows' => 1, 'processed_by_ai' => true, 'ai_tool_id' => $aiTool,
             ]);
             $this->record('import_mappings', ['import_batch_id' => $batch, 'external_column_name' => 'Royalty'], [

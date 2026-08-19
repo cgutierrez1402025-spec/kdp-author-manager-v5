@@ -4,22 +4,30 @@
 
 La integración soportada se basa en archivos descargados manualmente desde KDP Reports. Amazon no documenta una API pública de cuenta KDP para obtener ventas privadas o modificar publicaciones. No se solicitan credenciales, cookies ni sesiones de Amazon.
 
-La interfaz admite CSV y XLSX de hasta 20 MB y permite clasificar el archivo como regalías anteriores, ventas y regalías, pedidos, KENP, pagos o histórico.
+La interfaz admite hasta 20 archivos CSV/XLSX de 20 MB cada uno o ZIP de hasta 100 MB. Puede detectar automáticamente regalías anteriores, ventas y regalías, pedidos, KENP, pagos o histórico; el usuario todavía puede forzar un tipo común cuando conoce el contenido.
 
 ## Flujo interno
 
-1. Filament guarda el archivo en `storage/app/private/kdp-imports`.
-2. Se calcula SHA-256. Un archivo idéntico ya registrado se rechaza.
-3. Se crea un registro en `import_batches` con usuario, periodo, tipo y ruta privada.
-4. El lector extrae todas las hojas del XLSX o detecta el delimitador del CSV.
-5. Se localiza la cabecera dentro de las primeras 25 filas.
-6. Las columnas en español o inglés se convierten al esquema canónico.
-7. Las filas de definiciones y resumen se ignoran.
-8. En Sales & Royalties se usa `Ventas combinadas` como fuente canónica de regalías y se ignoran hojas duplicadas por formato. `KENP leídas` se conserva como métrica independiente.
-9. Cada fila obtiene una huella estable, de modo que una reimportación no duplica datos.
-10. Se intenta vincular con una publicación del autor por ASIN y formato.
-11. Se crea o actualiza el título observado en `kdp_catalog_items`, incluso cuando no existe una obra interna.
-12. El lote termina como `completed` o `failed` y conserva contadores y errores.
+1. Filament guarda los archivos en `storage/app/private/kdp-imports`.
+2. Si se recibe un ZIP, sólo extrae CSV, TXT y XLSX con nombres saneados, límite de 20 MB por entrada y 100 MB descomprimidos.
+3. Se crea una `import_session` que agrega estado y contadores de toda la operación.
+4. Para cada archivo se calcula SHA-256; un duplicado se omite sin cancelar los demás.
+5. La cabecera, hojas y nombre del archivo permiten detectar tipo, confianza y periodo.
+6. Se crea un `import_batch` independiente por archivo con usuario, periodo, detección y ruta privada.
+7. El lector extrae todas las hojas del XLSX o detecta el delimitador del CSV y localiza la cabecera en las primeras 25 filas.
+8. Las columnas en español o inglés se convierten al esquema canónico y las filas de definición/resumen se ignoran.
+9. En Sales & Royalties se usa `Ventas combinadas` como fuente canónica; `KENP leídas` se conserva como métrica independiente.
+10. Cada fila obtiene una huella estable, se vincula por ASIN/formato y actualiza `kdp_catalog_items`.
+11. Cada archivo confirma o revierte su propia transacción. La sesión termina `completed`, `partial` o `failed`.
+
+## Uso de la carga múltiple
+
+1. Abre **Publicaciones → Importar informes KDP**.
+2. Arrastra o selecciona hasta 20 informes; también puedes elegir un ZIP.
+3. Mantén **Detectar automáticamente**. El periodo manual sólo actúa como respaldo cuando no aparece en el nombre.
+4. Inicia la importación una sola vez.
+5. Consulta **Publicaciones → Sesiones de importación** para ver archivos completados, duplicados, fallidos y filas nuevas.
+6. Usa **Ver archivos** para revisar cada lote y reprocesar únicamente el necesario.
 
 ## Campos normalizados
 
@@ -61,6 +69,8 @@ Procedimiento recomendado:
 
 ## Estados y contadores
 
+Una sesión utiliza `processing`, `completed`, `partial` o `failed`. `partial` indica que al menos un archivo terminó y otro falló. Los archivos no reconocidos quedan como `needs_review` y no bloquean la sesión.
+
 - `pending`: lote creado;
 - `processing`: lectura activa;
 - `completed`: proceso terminado, incluso si algunas filas presentan error;
@@ -78,5 +88,5 @@ Los contadores significan:
 - Amazon puede cambiar nombres y estructura de sus hojas; los alias deben mantenerse versionados.
 - Los informes localizados en idiomas distintos de español e inglés pueden requerir nuevos alias.
 - Las filas sin ASIN solo se admiten si son pagos con número de pago.
-- La carga se procesa de forma síncrona; archivos grandes deberían migrarse a un trabajo en cola.
+- La sesión aísla cada archivo, aunque actualmente se ejecuta en la misma petición. Para volúmenes superiores a los límites de interfaz se debe configurar una cola.
 - Los gráficos representan los datos descargados, no información en tiempo real.
