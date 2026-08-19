@@ -16,6 +16,8 @@ class ImportBatchResource extends Resource
 {
     protected static ?string $model = ImportBatch::class;
 
+    protected static ?string $slug = 'importaciones-kdp';
+
     protected static ?string $navigationIcon = 'heroicon-o-arrow-up-tray';
 
     protected static ?string $navigationLabel = 'Importar informes KDP';
