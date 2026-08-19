@@ -34,7 +34,7 @@
 
 ### Importación KDP
 
-`users → import_batches → kdp_report_rows` constituye la fuente detallada nueva. `import_errors`, `import_rows` e `import_mappings` se mantienen para trazabilidad genérica y flujos heredados.
+`users → import_batches → kdp_report_rows` constituye la fuente detallada nueva. `kdp_catalog_items` mantiene la dimensión de títulos/ediciones observados, incluidos los que aún no existen como obra. `import_errors`, `import_rows` e `import_mappings` se mantienen para trazabilidad genérica y flujos heredados.
 
 `kdp_report_rows` conserva dimensiones, métricas, JSON original, JSON normalizado, huella y vínculos opcionales. `row_kind` evita sumar dos conceptos distintos:
 
@@ -65,4 +65,3 @@ El archivo se identifica con SHA-256 y cada fila con otra huella SHA-256 constru
 - mapeo asistido de ASIN no vinculados;
 - procesamiento en cola para archivos grandes;
 - señales de decisión persistentes y asistente IA multiproveedor.
-

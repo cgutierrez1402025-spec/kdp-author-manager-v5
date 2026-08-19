@@ -4,6 +4,8 @@ La versión 5 incorpora importación auditable de los informes CSV/XLSX descarga
 
 Cada archivo se conserva en almacenamiento privado, se registra como lote y sus filas se normalizan en `kdp_report_rows`, manteniendo también los valores originales. Las reimportaciones se detectan mediante huellas SHA-256 y las filas se vinculan con publicaciones propias por ASIN y formato cuando existe una coincidencia inequívoca.
 
+Los títulos ausentes se registran automáticamente en `kdp_catalog_items` y aparecen en **Catálogo detectado KDP**. Permanecen pendientes hasta que el autor los vincule o complete los datos editoriales que los informes de Amazon no proporcionan.
+
 Aplicación web para gestionar el ciclo editorial de obras publicadas mediante Amazon KDP: manuscritos, publicaciones, metadatos, regalías, promociones, eventos, fuentes, ilustraciones y tareas asistidas por IA.
 
 El panel de administración está construido con Laravel 12, Filament 3, Livewire 3, SQLite/MySQL y Vite.

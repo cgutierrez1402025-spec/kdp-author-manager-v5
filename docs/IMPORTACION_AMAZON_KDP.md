@@ -18,7 +18,8 @@ La interfaz admite CSV y XLSX de hasta 20 MB y permite clasificar el archivo com
 8. En Sales & Royalties se usa `Ventas combinadas` como fuente canónica de regalías y se ignoran hojas duplicadas por formato. `KENP leídas` se conserva como métrica independiente.
 9. Cada fila obtiene una huella estable, de modo que una reimportación no duplica datos.
 10. Se intenta vincular con una publicación del autor por ASIN y formato.
-11. El lote termina como `completed` o `failed` y conserva contadores y errores.
+11. Se crea o actualiza el título observado en `kdp_catalog_items`, incluso cuando no existe una obra interna.
+12. El lote termina como `completed` o `failed` y conserva contadores y errores.
 
 ## Campos normalizados
 
@@ -49,6 +50,8 @@ El importe y la moneda originales se conservan. Los gráficos agrupan regalías 
 
 La asociación automática busca el ASIN entre las publicaciones del usuario y, cuando el informe permite inferirlo, el formato. Una fila puede ser válida aunque `publication_id` sea nulo. Esto sucede cuando el libro todavía no existe en el catálogo interno o el formato no coincide.
 
+Los títulos no vinculados aparecen en **Publicaciones → Catálogo detectado KDP** como pendientes. No se crea automáticamente una obra editorial porque el informe no aporta idioma original ni versión de manuscrito; el registro observado conserva todos los datos disponibles hasta que el autor complete la revisión.
+
 Procedimiento recomendado:
 
 1. crear o corregir la publicación y su ASIN;
@@ -77,4 +80,3 @@ Los contadores significan:
 - Las filas sin ASIN solo se admiten si son pagos con número de pago.
 - La carga se procesa de forma síncrona; archivos grandes deberían migrarse a un trabajo en cola.
 - Los gráficos representan los datos descargados, no información en tiempo real.
-

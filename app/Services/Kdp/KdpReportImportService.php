@@ -4,6 +4,7 @@ namespace App\Services\Kdp;
 
 use App\Models\ImportBatch;
 use App\Models\ImportError;
+use App\Models\KdpCatalogItem;
 use App\Models\KdpReportRow;
 use App\Models\Publication;
 use Carbon\Carbon;
@@ -19,6 +20,7 @@ class KdpReportImportService
         'title' => ['title', 'titulo'],
         'author' => ['author', 'autor', 'nombre del autor'],
         'asin' => ['asin', 'asin/isbn'],
+        'isbn' => ['isbn'],
         'format' => ['format', 'formato'],
         'marketplace' => ['marketplace', 'mercado', 'tienda'],
         'currency' => ['currency', 'moneda'],
@@ -162,10 +164,14 @@ class KdpReportImportService
                     continue;
                 }
 
+                $publicationId = $this->publicationId($batch, $normalized);
+                $catalogItem = $this->catalogItem($batch, $normalized, $publicationId);
+
                 KdpReportRow::create($normalized + [
                     'user_id' => $batch->user_id,
                     'import_batch_id' => $batch->id,
-                    'publication_id' => $this->publicationId($batch, $normalized),
+                    'publication_id' => $publicationId,
+                    'kdp_catalog_item_id' => $catalogItem?->id,
                     'row_fingerprint' => $fingerprint,
                     'report_type' => $batch->import_type,
                     'source_sheet' => $sheet,
@@ -256,6 +262,55 @@ class KdpReportImportService
             ->when($row['format'] ?? null, fn ($query, $format) => $query->where('format', $format))
             ->whereHas('work', fn ($query) => $query->where('user_id', $batch->user_id))
             ->value('id');
+    }
+
+    /** @param array<string, mixed> $row */
+    private function catalogItem(ImportBatch $batch, array $row, ?int $publicationId): ?KdpCatalogItem
+    {
+        if (empty($row['title']) && empty($row['asin']) && empty($row['isbn'])) {
+            return null;
+        }
+
+        $identity = hash('sha256', implode('|', [
+            strtoupper((string) ($row['asin'] ?? '')),
+            preg_replace('/[^0-9X]/i', '', (string) ($row['isbn'] ?? '')),
+            $this->normalizeHeader((string) ($row['title'] ?? '')),
+            $this->normalizeHeader((string) ($row['author'] ?? '')),
+            (string) ($row['format'] ?? ''),
+        ]));
+
+        $item = KdpCatalogItem::firstOrNew([
+            'user_id' => $batch->user_id,
+            'identity_key' => $identity,
+        ]);
+        $marketplaces = collect($item->marketplaces ?? [])
+            ->push($row['marketplace'] ?? null)
+            ->filter()
+            ->unique()
+            ->sort()
+            ->values()
+            ->all();
+        $publication = $publicationId ? Publication::with('work')->find($publicationId) : null;
+
+        $item->fill([
+            'work_id' => $publication?->work_id,
+            'publication_id' => $publicationId,
+            'asin' => $row['asin'] ?? $item->asin,
+            'isbn' => $row['isbn'] ?? $item->isbn,
+            'title' => $row['title'] ?? $item->title ?? 'Título no informado',
+            'author' => $row['author'] ?? $item->author,
+            'format' => $row['format'] ?? $item->format,
+            'marketplaces' => $marketplaces,
+            'review_status' => $publicationId ? 'linked' : 'pending',
+            'first_seen_at' => $item->first_seen_at ?? now(),
+            'last_seen_at' => now(),
+        ])->save();
+
+        if ($publication && ! $publication->isbn && ! empty($row['isbn'])) {
+            $publication->update(['isbn' => $row['isbn']]);
+        }
+
+        return $item;
     }
 
     private function normalizeHeader(string $header): string

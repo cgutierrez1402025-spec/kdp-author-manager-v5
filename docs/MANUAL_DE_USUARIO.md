@@ -63,6 +63,8 @@ Los periodos KDP Select permiten registrar inicio, fin, renovación y días de p
 6. Revisa filas importadas, duplicadas y erróneas.
 7. Regresa al panel para ver los gráficos.
 
+Cada título nuevo aparece automáticamente en **Publicaciones → Catálogo detectado KDP**. El estado `Pendiente de revisión` significa que KDP aportó información comercial, pero todavía no existe una obra/publicación interna con coincidencia fiable. `Vinculada` significa que ASIN y formato enlazaron con el catálogo editorial.
+
 La acción **Reprocesar** elimina únicamente las filas derivadas de ese lote y vuelve a crearlas desde el archivo original privado. Es útil después de actualizar reglas de mapeo. No elimina el archivo original.
 
 Consulte [IMPORTACION_AMAZON_KDP.md](IMPORTACION_AMAZON_KDP.md) para formatos, controles y resolución de incidencias.
@@ -80,4 +82,3 @@ Las tareas se vinculan a una obra y tienen responsable, prioridad, estado y venc
 ## Funciones de IA
 
 La aplicación conserva herramientas, tareas y prompts de IA. El servicio disponible puede sugerir etiquetas, mejorar descripciones y traducir texto cuando existe una clave configurada. Todo resultado debe revisarse. No se deben enviar datos bancarios, credenciales, información personal innecesaria ni manuscritos confidenciales sin valorar las condiciones del proveedor.
-

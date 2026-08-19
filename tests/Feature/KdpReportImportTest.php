@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\ImportBatch;
+use App\Models\KdpCatalogItem;
 use App\Models\KdpReportRow;
 use App\Models\ManuscriptVersion;
 use App\Models\Marketplace;
@@ -56,6 +57,12 @@ class KdpReportImportTest extends TestCase
         $this->assertSame(10, $row->net_units_sold);
         $this->assertSame('25.5000', $row->total_earnings);
         $this->assertSame('EUR', $row->currency);
+        $this->assertDatabaseHas('kdp_catalog_items', [
+            'user_id' => $user->id,
+            'asin' => 'B012345678',
+            'publication_id' => $publication->id,
+            'review_status' => 'linked',
+        ]);
         $this->assertSame('completed', $batch->refresh()->status);
         $this->assertSame(1, $batch->imported_rows);
     }
@@ -103,6 +110,29 @@ class KdpReportImportTest extends TestCase
         $this->assertSame('Title', $tables['Sheet1'][0][0]);
         $this->assertSame('Libro XLSX', $tables['Sheet1'][1][0]);
         $this->assertSame('12.5', $tables['Sheet1'][1][2]);
+    }
+
+    public function test_preserves_an_unknown_title_in_the_detected_catalog(): void
+    {
+        Storage::fake('local');
+        $user = User::factory()->create();
+        $this->actingAs($user);
+        $csv = "Title,Author,ASIN,Marketplace,Currency,Format,Net Units Sold,Total Earnings\nObra desconocida,Autora Nueva,B099999999,Amazon.es,EUR,eBook,3,4.20";
+        Storage::disk('local')->put('private/kdp-imports/unknown.csv', $csv);
+        $batch = ImportBatch::create([
+            'user_id' => $user->id, 'import_type' => 'prior_royalties', 'report_period' => '2026-07-01',
+            'source_system' => 'amazon_kdp', 'original_file_path' => 'private/kdp-imports/unknown.csv',
+            'original_file_name' => 'unknown.csv', 'file_hash' => hash('sha256', $csv),
+            'detected_format' => 'csv', 'status' => 'pending', 'processed_by_ai' => false,
+        ]);
+
+        app(KdpReportImportService::class)->import($batch);
+
+        $item = KdpCatalogItem::firstOrFail();
+        $this->assertSame('Obra desconocida', $item->title);
+        $this->assertSame('pending', $item->review_status);
+        $this->assertNull($item->work_id);
+        $this->assertSame($item->id, KdpReportRow::firstOrFail()->kdp_catalog_item_id);
     }
 
     private function publication(User $user, string $asin, string $format): Publication

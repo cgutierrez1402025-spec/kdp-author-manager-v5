@@ -35,6 +35,11 @@ class KdpReportRow extends Model
         return $this->belongsTo(Publication::class);
     }
 
+    public function catalogItem(): BelongsTo
+    {
+        return $this->belongsTo(KdpCatalogItem::class, 'kdp_catalog_item_id');
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

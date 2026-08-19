@@ -172,8 +172,15 @@ class ComprehensiveDemoSeeder extends Seeder
                 'mapped_by_ai' => true, 'confirmed_by_user' => true,
             ]);
             $royalty = DB::table('royalty_entries')->where('publication_id', $publication->id)->first();
+            $catalogItem = $this->record('kdp_catalog_items', ['user_id' => $author, 'identity_key' => hash('sha256', 'demo-kdp-catalog-item')], [
+                'work_id' => $work->id, 'publication_id' => $publication->id, 'asin' => $publication->asin,
+                'title' => $work->title_public, 'author' => $work->author_name, 'format' => $publication->format,
+                'marketplaces' => json_encode(['Amazon.es']), 'review_status' => 'linked',
+                'first_seen_at' => now()->subMonth(), 'last_seen_at' => now(),
+            ]);
             $this->record('kdp_report_rows', ['user_id' => $author, 'row_fingerprint' => hash('sha256', 'demo-kdp-row-2026')], [
-                'import_batch_id' => $batch, 'publication_id' => $publication->id, 'report_type' => 'prior_royalties',
+                'import_batch_id' => $batch, 'publication_id' => $publication->id, 'kdp_catalog_item_id' => $catalogItem,
+                'report_type' => 'prior_royalties',
                 'report_period' => '2026-01-01', 'title' => $work->title_public, 'author' => $work->author_name,
                 'asin' => $publication->asin, 'format' => $publication->format, 'marketplace' => 'Amazon.es',
                 'currency' => 'EUR', 'transaction_type' => 'Sale', 'units_sold' => 42, 'units_refunded' => 2,

@@ -29,11 +29,12 @@ Fecha: 19 de agosto de 2026
 
 ## Resultado final
 
-- 62 pruebas superadas.
-- 447 aserciones correctas.
+- 63 pruebas superadas.
+- 458 aserciones correctas.
 - 19 listados y 19 formularios de edición probados con datos sembrados.
 - 105 relaciones Eloquent resueltas correctamente.
 - Migración limpia y seeders correctos.
 - Ninguna violación de claves foráneas.
 - Build de producción correcto.
 - Informe KDP real reprocesado: 39 filas canónicas, 0 duplicadas y 0 errores.
+- 14 títulos/ediciones ausentes detectados y conservados automáticamente en el catálogo KDP pendiente.
