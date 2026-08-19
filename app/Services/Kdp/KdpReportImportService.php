@@ -83,21 +83,58 @@ class KdpReportImportService
     {
         abort_unless($batch->user_id === auth()->id() || auth()->user()?->canViewAllAuthorData(), 403);
 
-        DB::transaction(function () use ($batch): void {
-            $batch->reportRows()->delete();
-            $batch->errors()->delete();
-            $batch->update([
-                'status' => 'pending',
-                'total_rows' => 0,
-                'imported_rows' => 0,
-                'skipped_rows' => 0,
-                'error_rows' => 0,
-                'started_at' => null,
-                'finished_at' => null,
+        $catalogItemIds = $batch->reportRows()->whereNotNull('kdp_catalog_item_id')->pluck('kdp_catalog_item_id')->unique();
+        $reportRowIds = $batch->reportRows()->pluck('id');
+        $paymentIds = KdpPaymentAllocation::whereIn('kdp_report_row_id', $reportRowIds)->pluck('kdp_payment_id')->unique();
+
+        try {
+            return DB::transaction(function () use ($batch, $catalogItemIds, $paymentIds): ImportBatch {
+                $lockedBatch = ImportBatch::whereKey($batch->id)->lockForUpdate()->firstOrFail();
+                $path = Storage::disk('local')->path($lockedBatch->original_file_path);
+                if (! is_file($path) || hash_file('sha256', $path) !== $lockedBatch->file_hash) {
+                    throw new RuntimeException('El archivo original no existe o no coincide con su huella SHA-256.');
+                }
+
+                $lockedBatch->reportRows()->delete();
+                $lockedBatch->errors()->delete();
+                $lockedBatch->update([
+                    'status' => 'pending', 'total_rows' => 0, 'imported_rows' => 0,
+                    'skipped_rows' => 0, 'error_rows' => 0, 'started_at' => null, 'finished_at' => null,
+                ]);
+
+                $result = $this->import($lockedBatch->refresh());
+                $this->cleanDerivedRecords($catalogItemIds->all(), $paymentIds->all());
+
+                return $result;
+            });
+        } catch (Throwable $exception) {
+            $batch->refresh()->update(['notes' => 'Reprocesado fallido; se conservaron los datos anteriores. '.$exception->getMessage()]);
+            throw $exception;
+        }
+    }
+
+    /** @param array<int, int> $catalogItemIds
+     * @param  array<int, int>  $paymentIds
+     */
+    private function cleanDerivedRecords(array $catalogItemIds, array $paymentIds): void
+    {
+        KdpCatalogItem::whereKey($catalogItemIds)->each(function (KdpCatalogItem $item): void {
+            if (! $item->reportRows()->exists()) {
+                if ($item->review_status === 'pending' && ! $item->work_id && ! $item->publication_id) {
+                    $item->delete();
+                }
+
+                return;
+            }
+
+            $item->update([
+                'marketplaces' => $item->reportRows()->whereNotNull('marketplace')->pluck('marketplace')->unique()->sort()->values()->all(),
+                'first_seen_at' => $item->reportRows()->min('created_at'),
+                'last_seen_at' => $item->reportRows()->max('created_at'),
             ]);
         });
 
-        return $this->import($batch->refresh());
+        KdpPayment::whereKey($paymentIds)->doesntHave('allocations')->delete();
     }
 
     /** @return array<string, array<int, array<int, string|null>>> */

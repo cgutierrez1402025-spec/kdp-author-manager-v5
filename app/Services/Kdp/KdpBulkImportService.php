@@ -122,4 +122,22 @@ class KdpBulkImportService
         $status = $failed === 0 ? 'completed' : ($completed > 0 || $session->duplicate_files > 0 ? 'partial' : 'failed');
         $session->update(['status' => $status, 'imported_rows' => $totals->imported, 'skipped_rows' => $totals->skipped, 'error_rows' => $totals->errors, 'finished_at' => now()]);
     }
+
+    public function reprocessSession(ImportSession $session): ImportSession
+    {
+        abort_unless($session->user_id === auth()->id() || auth()->user()?->canViewAllAuthorData(), 403);
+        $session->update(['status' => 'processing', 'completed_files' => 0, 'failed_files' => 0, 'imported_rows' => 0, 'skipped_rows' => 0, 'error_rows' => 0, 'started_at' => now(), 'finished_at' => null]);
+
+        foreach ($session->batches as $batch) {
+            try {
+                $this->importer->reprocess($batch);
+                $session->increment('completed_files');
+            } catch (Throwable) {
+                $session->increment('failed_files');
+            }
+        }
+        $this->summarize($session);
+
+        return $session->refresh();
+    }
 }

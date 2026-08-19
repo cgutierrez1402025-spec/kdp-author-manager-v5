@@ -19,6 +19,7 @@ Fecha: 19 de agosto de 2026
 13. Importación múltiple KDP: detección de tipo/periodo, varios informes, ZIP seguro, duplicados, aislamiento de fallos y autorización.
 14. Inteligencia de decisión: histórico temporal de precios, métricas de mercado, solapamientos, consentimiento analítico y diagnóstico operativo.
 15. Promoción del catálogo KDP: creación transaccional de obra/idioma/edición, publicación sin manuscrito ficticio, permisos y materialización idempotente de pagos.
+16. Reprocesado seguro: idempotencia, SHA-256, bloqueo, rollback con datos anteriores, limpieza de derivados y sesión con fallos parciales.
 
 ## Errores corregidos
 
@@ -33,8 +34,8 @@ Fecha: 19 de agosto de 2026
 
 ## Resultado final
 
-- 81 pruebas superadas.
-- 582 aserciones correctas.
+- 83 pruebas superadas.
+- 592 aserciones correctas.
 - 22 listados y 21 formularios de edición probados con datos sembrados.
 - 105 relaciones Eloquent resueltas correctamente.
 - Migración limpia y seeders correctos.

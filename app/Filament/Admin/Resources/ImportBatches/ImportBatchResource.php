@@ -132,7 +132,7 @@ class ImportBatchResource extends Resource
                     ->label('Reprocesar')
                     ->icon('heroicon-o-arrow-path')
                     ->requiresConfirmation()
-                    ->modalDescription('Se reconstruirán las filas derivadas desde el archivo original conservado.')
+                    ->modalDescription('Se reconstruirán filas, catálogo y pagos desde el archivo original. Si falla, la operación se revierte y se conservan todos los datos anteriores.')
                     ->action(function (ImportBatch $record): void {
                         try {
                             $batch = app(KdpReportImportService::class)->reprocess($record);

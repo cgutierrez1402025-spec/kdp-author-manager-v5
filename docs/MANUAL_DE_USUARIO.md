@@ -69,6 +69,8 @@ Para incorporar un título pendiente a **Obras**, usa **Crear obra y edición**,
 
 La acción **Reprocesar** elimina únicamente las filas derivadas de ese lote y vuelve a crearlas desde el archivo original privado. Es útil después de actualizar reglas de mapeo. No elimina el archivo original.
 
+También puedes usar **Reprocesar sesión** para repetir todos los archivos de una carga. La aplicación valida la huella del archivo y conserva los datos anteriores de cualquier fichero que falle; no elimina obras ni vínculos confirmados por el usuario.
+
 Consulte [IMPORTACION_AMAZON_KDP.md](IMPORTACION_AMAZON_KDP.md) para formatos, controles y resolución de incidencias.
 
 ## Regalías, pagos y promociones

@@ -4,6 +4,8 @@ namespace App\Filament\Admin\Resources\ImportSessions;
 
 use App\Filament\Admin\Resources\ImportSessions\Pages\ListImportSessions;
 use App\Models\ImportSession;
+use App\Services\Kdp\KdpBulkImportService;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -42,6 +44,14 @@ class ImportSessionResource extends Resource
         ])->actions([
             Tables\Actions\Action::make('batches')->label('Ver archivos')->icon('heroicon-o-document-magnifying-glass')
                 ->url(fn (ImportSession $record) => route('filament.admin.resources.importaciones-kdp.index', ['tableFilters[import_session_id][value]' => $record->id])),
+            Tables\Actions\Action::make('reprocess')->label('Reprocesar sesión')->icon('heroicon-o-arrow-path')
+                ->requiresConfirmation()->modalDescription('Cada archivo se reconstruirá de forma atómica. Si uno falla, conservará sus datos anteriores y los demás continuarán.')
+                ->action(function (ImportSession $record): void {
+                    $session = app(KdpBulkImportService::class)->reprocessSession($record);
+                    Notification::make()->title('Reprocesado finalizado')
+                        ->body("{$session->completed_files} archivos correctos y {$session->failed_files} fallidos; {$session->imported_rows} filas reconstruidas.")
+                        ->color($session->failed_files ? 'warning' : 'success')->send();
+                }),
         ]);
     }
 

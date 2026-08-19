@@ -90,13 +90,43 @@ class KdpReportImportTest extends TestCase
 
         $service = app(KdpReportImportService::class);
         $service->import($batch);
-        $service->import($batch);
+        $service->reprocess($batch);
 
         $this->assertDatabaseCount('kdp_report_rows', 1);
         $this->assertDatabaseCount('kdp_payments', 1);
         $this->assertDatabaseCount('kdp_payment_allocations', 1);
         $this->assertDatabaseHas('kdp_payment_allocations', ['status' => 'unallocated', 'publication_id' => null]);
-        $this->assertSame(1, $batch->refresh()->skipped_rows);
+        $this->assertSame(1, $batch->refresh()->imported_rows);
+        $this->assertSame(0, $batch->refresh()->skipped_rows);
+    }
+
+    public function test_failed_reprocessing_preserves_previous_rows(): void
+    {
+        Storage::fake('local');
+        $user = User::factory()->create();
+        $this->actingAs($user);
+        $path = 'private/kdp-imports/preserved.csv';
+        $csv = "Payment Number,Currency,Payment Date,Payment Amount\nP-SAFE,EUR,2026-07-29,50.00";
+        Storage::disk('local')->put($path, $csv);
+        $batch = ImportBatch::create([
+            'user_id' => $user->id, 'import_type' => 'payments', 'report_period' => '2026-07-01', 'source_system' => 'amazon_kdp',
+            'original_file_path' => $path, 'original_file_name' => 'preserved.csv', 'file_hash' => hash('sha256', $csv),
+            'detected_format' => 'csv', 'status' => 'pending', 'processed_by_ai' => false,
+        ]);
+        $service = app(KdpReportImportService::class);
+        $service->import($batch);
+        $rowId = KdpReportRow::firstOrFail()->id;
+        Storage::disk('local')->delete($path);
+
+        try {
+            $service->reprocess($batch);
+            $this->fail('El reprocesado debía fallar sin archivo original.');
+        } catch (\Throwable) {
+            $this->assertDatabaseHas('kdp_report_rows', ['id' => $rowId, 'payment_number' => 'P-SAFE']);
+            $this->assertDatabaseHas('kdp_payments', ['payment_number' => 'P-SAFE']);
+            $this->assertSame('completed', $batch->fresh()->status);
+            $this->assertStringContainsString('se conservaron los datos anteriores', $batch->fresh()->notes);
+        }
     }
 
     public function test_reads_a_real_xlsx_workbook(): void

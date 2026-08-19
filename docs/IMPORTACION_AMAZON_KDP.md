@@ -71,6 +71,12 @@ Procedimiento recomendado:
 3. usar **Reprocesar**;
 4. comprobar el vínculo y los gráficos.
 
+### Reprocesado coherente
+
+**Reprocesar** verifica la huella SHA-256 y bloquea el lote antes de sustituir datos. Dentro de una única transacción reconstruye filas, errores y proyecciones de pagos, recalcula el catálogo afectado y elimina únicamente elementos pendientes que hayan quedado huérfanos. Las obras, publicaciones y decisiones revisadas por el usuario no se eliminan. Si falta el archivo, ha cambiado o el parser falla, se revierte la transacción y se conserva íntegramente el resultado anterior.
+
+En **Sesiones de importación**, **Reprocesar sesión** repite todos los lotes con una transacción independiente por archivo. Un fallo conserva ese archivo y no impide actualizar los demás; la sesión termina `partial` cuando corresponde.
+
 ## Estados y contadores
 
 Una sesión utiliza `processing`, `completed`, `partial` o `failed`. `partial` indica que al menos un archivo terminó y otro falló. Los archivos no reconocidos quedan como `needs_review` y no bloquean la sesión.

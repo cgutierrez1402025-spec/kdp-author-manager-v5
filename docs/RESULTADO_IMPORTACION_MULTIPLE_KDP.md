@@ -14,6 +14,7 @@ Fecha de verificación: 19 de agosto de 2026.
 - Archivos duplicados omitidos sin cancelar los restantes.
 - Informes no reconocidos conservados como `needs_review`.
 - Resumen en **Publicaciones → Sesiones de importación** y filtro de lotes por sesión.
+- Reprocesado completo de sesión, aislado y atómico por archivo.
 - Aislamiento de sesiones y lotes por autor.
 
 ## Seguridad de ZIP
@@ -23,6 +24,10 @@ La aplicación no extrae rutas del ZIP directamente. Lee sólo entradas admitida
 ## Compatibilidad
 
 El servicio múltiple orquesta `KdpReportImportService`; no mantiene un segundo normalizador. Por ello conserva asociación ASIN/formato, catálogo detectado, huellas de filas, importes originales, monedas y gráficos existentes. Los lotes anteriores tienen `import_session_id` nulo y continúan siendo consultables.
+
+## Coherencia durante el reprocesado
+
+Antes de sustituir datos se comprueba SHA-256 y se bloquea el lote. La eliminación y reinserción se realizan dentro de la misma transacción. Se reconstruyen `kdp_report_rows`, `import_errors`, asignaciones y pagos derivados; se recalculan marketplaces del catálogo y sólo se eliminan elementos pendientes sin filas ni vínculos. Ante una excepción se restaura el estado anterior completo.
 
 ## Verificación realizada
 
