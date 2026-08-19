@@ -10,6 +10,10 @@
 - [`PRUEBAS_Y_RESOLUCION_DE_PROBLEMAS.md`](PRUEBAS_Y_RESOLUCION_DE_PROBLEMAS.md): validación y diagnóstico.
 - [`INFORME_PANEL_DECISIONES_KDP_IA.md`](INFORME_PANEL_DECISIONES_KDP_IA.md): informe y hoja de ruta que originan la v5.
 - [`EVALUACION_INFORMES_KDP_Y_MODELO_DE_DATOS.md`](EVALUACION_INFORMES_KDP_Y_MODELO_DE_DATOS.md): matriz de informes, duplicados, campos vacíos y decisión sobre nuevas tablas.
+- [`AUDITORIA_PAGOS_KDP.md`](AUDITORIA_PAGOS_KDP.md): limitaciones de pagos y diseño de conciliación pago‑obra.
+- [`INFORME_INTEGRACION_AUDIOLIBROS.md`](INFORME_INTEGRACION_AUDIOLIBROS.md): opciones KDP/ACX y cambios completos del dominio.
+- [`ENUNCIADO_ESTUDIANTES_MODULO_AUDIOLIBROS.md`](ENUNCIADO_ESTUDIANTES_MODULO_AUDIOLIBROS.md): proyecto evaluable para diseñar e implementar el módulo.
+- [`PLAN_IMPLEMENTACION_AUDIOLIBROS.md`](PLAN_IMPLEMENTACION_AUDIOLIBROS.md): fases, dependencias y puertas de calidad.
 - [`TEST_PLAN_AND_RESULTS.md`](TEST_PLAN_AND_RESULTS.md): cobertura y último resultado verificado.
 - [`FORM_RELATIONSHIP_AUDIT.md`](FORM_RELATIONSHIP_AUDIT.md): asociaciones entre entidades y formularios Filament.
 - [`ERROR_REVIEW_PLAN.md`](ERROR_REVIEW_PLAN.md): estrategia de revisión y regresión.
