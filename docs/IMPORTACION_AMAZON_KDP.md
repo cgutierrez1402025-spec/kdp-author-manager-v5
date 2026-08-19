@@ -62,6 +62,8 @@ La asociación automática busca el ASIN entre las publicaciones del usuario y, 
 
 Los títulos no vinculados aparecen en **Publicaciones → Catálogo detectado KDP** como pendientes. No se crea automáticamente una obra editorial porque el informe no aporta idioma original ni versión de manuscrito; el registro observado conserva todos los datos disponibles hasta que el autor complete la revisión.
 
+Desde ese listado se puede usar **Crear obra y edición** para completar idioma, marketplace y formato, o **Vincular a obra**. La operación crea las relaciones necesarias de forma transaccional y nunca inventa un manuscrito. También puede marcarse un elemento como ignorado.
+
 Procedimiento recomendado:
 
 1. crear o corregir la publicación y su ASIN;
@@ -84,6 +86,10 @@ Los contadores significan:
 - duplicadas: filas equivalentes ya existentes;
 - errores: filas reconocidas que no pudieron normalizarse;
 - total: filas de datos examinadas en hojas seleccionadas.
+
+## Proyección de pagos
+
+Las filas de pago se conservan en `kdp_report_rows` y se materializan en `kdp_payments`/`kdp_payment_allocations`. Un pago sin relación explícita con una publicación queda sin asignar. Para reconstruir esta proyección desde informes anteriores se utiliza `php artisan kdp:materialize-payments`.
 
 ## Límites conocidos
 

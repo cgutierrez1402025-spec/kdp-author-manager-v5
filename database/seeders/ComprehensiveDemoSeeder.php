@@ -238,7 +238,7 @@ class ComprehensiveDemoSeeder extends Seeder
                 'marketplaces' => json_encode(['Amazon.es']), 'review_status' => 'linked',
                 'first_seen_at' => now()->subMonth(), 'last_seen_at' => now(),
             ]);
-            $this->record('kdp_report_rows', ['user_id' => $author, 'row_fingerprint' => hash('sha256', 'demo-kdp-row-2026')], [
+            $reportRow = $this->record('kdp_report_rows', ['user_id' => $author, 'row_fingerprint' => hash('sha256', 'demo-kdp-row-2026')], [
                 'import_batch_id' => $batch, 'publication_id' => $publication->id, 'kdp_catalog_item_id' => $catalogItem,
                 'report_type' => 'prior_royalties',
                 'report_period' => '2026-01-01', 'title' => $work->title_public, 'author' => $work->author_name,
@@ -247,6 +247,15 @@ class ComprehensiveDemoSeeder extends Seeder
                 'net_units_sold' => 40, 'kenp_read' => 8500, 'total_earnings' => $royalty->total_royalty,
                 'raw_data' => json_encode(['ASIN' => $publication->asin, 'Total Earnings' => $royalty->total_royalty]),
                 'normalized_data' => json_encode(['asin' => $publication->asin, 'total_earnings' => $royalty->total_royalty]),
+            ]);
+            $kdpPayment = $this->record('kdp_payments', ['user_id' => $author, 'payment_number' => 'DEMO-PAY-2026-01', 'currency' => 'EUR'], [
+                'latest_import_batch_id' => $batch, 'marketplace' => 'Amazon.es', 'status' => 'Paid',
+                'payment_date' => '2026-03-29', 'accrued_royalty' => 245.80, 'tax_withholding' => 0,
+                'payment_amount' => 245.80, 'raw_data' => json_encode(['source' => 'demo']),
+            ]);
+            $this->record('kdp_payment_allocations', ['kdp_report_row_id' => $reportRow], [
+                'kdp_payment_id' => $kdpPayment, 'publication_id' => $publication->id, 'allocated_amount' => 245.80,
+                'currency' => 'EUR', 'allocation_method' => 'demo_reconciliation', 'status' => 'allocated', 'confidence' => 100,
             ]);
             $this->record('import_rows', ['import_batch_id' => $batch, 'row_number' => 1], [
                 'raw_data_json' => json_encode(['ASIN' => $publication->asin, 'Royalty' => $royalty->total_royalty]),

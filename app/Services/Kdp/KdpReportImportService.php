@@ -5,6 +5,8 @@ namespace App\Services\Kdp;
 use App\Models\ImportBatch;
 use App\Models\ImportError;
 use App\Models\KdpCatalogItem;
+use App\Models\KdpPayment;
+use App\Models\KdpPaymentAllocation;
 use App\Models\KdpReportRow;
 use App\Models\Publication;
 use Carbon\Carbon;
@@ -167,7 +169,7 @@ class KdpReportImportService
                 $publicationId = $this->publicationId($batch, $normalized);
                 $catalogItem = $this->catalogItem($batch, $normalized, $publicationId);
 
-                KdpReportRow::create($normalized + [
+                $reportRow = KdpReportRow::create($normalized + [
                     'user_id' => $batch->user_id,
                     'import_batch_id' => $batch->id,
                     'publication_id' => $publicationId,
@@ -179,6 +181,7 @@ class KdpReportImportService
                     'raw_data' => ['sheet' => $sheet, 'row' => $index + 1, 'values' => $raw],
                     'normalized_data' => $normalized,
                 ]);
+                $this->materializePayment($batch, $reportRow);
                 $counters['imported_rows']++;
             } catch (Throwable $exception) {
                 ImportError::create([
@@ -193,6 +196,50 @@ class KdpReportImportService
                 $counters['error_rows']++;
             }
         }
+    }
+
+    public function materializePayment(ImportBatch $batch, KdpReportRow $row): void
+    {
+        if ($row->row_kind !== 'payment' || ! $row->payment_number) {
+            return;
+        }
+
+        $payment = KdpPayment::updateOrCreate(
+            ['user_id' => $batch->user_id, 'payment_number' => $row->payment_number, 'currency' => $row->currency],
+            [
+                'latest_import_batch_id' => $batch->id, 'marketplace' => $row->marketplace,
+                'status' => $row->payment_status, 'payment_date' => $row->payment_date,
+                'accrued_royalty' => $row->accrued_royalty, 'tax_withholding' => $row->tax_withholding,
+                'fx_rate' => $row->fx_rate, 'payment_amount' => $row->payment_amount,
+                'raw_data' => $row->raw_data,
+            ],
+        );
+
+        KdpPaymentAllocation::updateOrCreate(
+            ['kdp_report_row_id' => $row->id],
+            [
+                'kdp_payment_id' => $payment->id, 'publication_id' => $row->publication_id,
+                'allocated_amount' => $row->publication_id ? $row->payment_amount : null,
+                'currency' => $row->currency, 'allocation_method' => 'source_row',
+                'status' => $row->publication_id ? 'allocated' : 'unallocated',
+                'confidence' => $row->publication_id ? 100 : null,
+            ],
+        );
+    }
+
+    public function materializeExistingPayments(?int $userId = null): int
+    {
+        $count = 0;
+        KdpReportRow::query()->with('importBatch')->where('row_kind', 'payment')->whereNotNull('payment_number')
+            ->when($userId, fn ($query) => $query->where('user_id', $userId))
+            ->chunkById(200, function ($rows) use (&$count): void {
+                foreach ($rows as $row) {
+                    $this->materializePayment($row->importBatch, $row);
+                    $count++;
+                }
+            });
+
+        return $count;
     }
 
     /** @param array<int, array<int, string|null>> $rows */
@@ -347,6 +394,7 @@ class KdpReportImportService
         return match (true) {
             str_contains($value, 'paperback'), str_contains($value, 'tapa blanda') => 'paperback',
             str_contains($value, 'hardcover'), str_contains($value, 'tapa dura') => 'hardcover',
+            str_contains($value, 'audiobook'), str_contains($value, 'audio book'), str_contains($value, 'audiolibro') => 'audiobook',
             str_contains($value, 'ebook'), str_contains($value, 'kindle') => 'ebook',
             str_contains($value, 'ventas combinadas'), str_contains($value, 'pedidos procesados') => 'ebook',
             default => null,

@@ -93,6 +93,9 @@ class KdpReportImportTest extends TestCase
         $service->import($batch);
 
         $this->assertDatabaseCount('kdp_report_rows', 1);
+        $this->assertDatabaseCount('kdp_payments', 1);
+        $this->assertDatabaseCount('kdp_payment_allocations', 1);
+        $this->assertDatabaseHas('kdp_payment_allocations', ['status' => 'unallocated', 'publication_id' => null]);
         $this->assertSame(1, $batch->refresh()->skipped_rows);
     }
 

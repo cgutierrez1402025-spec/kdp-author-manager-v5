@@ -6,6 +6,8 @@ Cada archivo se conserva en almacenamiento privado, se registra como lote y sus 
 
 Los títulos ausentes se registran automáticamente en `kdp_catalog_items` y aparecen en **Catálogo detectado KDP**. Permanecen pendientes hasta que el autor los vincule o complete los datos editoriales que los informes de Amazon no proporcionan.
 
+Desde ese catálogo puede utilizarse **Crear obra y edición** para incorporarlos a `works`, o **Vincular a obra** cuando ya existen. Los informes de pagos se proyectan en **Publicaciones → Pagos KDP** y permanecen sin asignar a una obra mientras Amazon no proporcione una relación inequívoca.
+
 La versión incluye además el núcleo operativo de audiolibros en **Publicaciones → Audiolibros** y **Narradores y voces**. Permite relacionar cada edición de audio con su obra, idioma y manuscrito; registrar producción humana, voz virtual, réplica de voz o modelos híbridos; y conservar capítulos, activos versionados, pronunciaciones, controles de calidad, distribución, costes y regalías. El servicio de flujo impide publicar sin derechos confirmados, capítulos y activos aprobados o, en una réplica, consentimiento vigente.
 
 Cada publicación dispone de históricos de precio y observaciones de mercado para analizar cambios sin sobrescribir el pasado. El perfil permite aceptar o retirar de forma explícita la participación en analítica agregada. El diagnóstico operativo puede ejecutarse con `php artisan app:health`.
