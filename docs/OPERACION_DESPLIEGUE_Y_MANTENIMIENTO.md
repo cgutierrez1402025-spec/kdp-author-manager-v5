@@ -25,7 +25,7 @@ En producción:
 php artisan migrate --force
 ```
 
-Realice una copia de seguridad antes. No use `migrate:fresh` con datos que deban conservarse.
+Realice una copia de seguridad antes. No use `migrate:fresh` con datos que deban conservarse. Los comandos destructivos están bloqueados fuera de `testing`; para una base temporal verificada se requiere `ALLOW_DESTRUCTIVE_DB_COMMANDS=true`.
 
 ## Almacenamiento
 
@@ -65,4 +65,3 @@ Revise `storage/logs`, trabajos fallidos, lotes `failed`, filas con errores y an
 ## Copias de seguridad
 
 Incluya base de datos y archivos KDP privados. Pruebe restauraciones periódicas. Una copia sin los archivos originales permite ver las filas, pero impide reprocesar lotes.
-

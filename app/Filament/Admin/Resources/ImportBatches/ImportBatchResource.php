@@ -5,6 +5,7 @@ namespace App\Filament\Admin\Resources\ImportBatches;
 use App\Filament\Admin\Resources\ImportBatches\Pages\CreateImportBatch;
 use App\Filament\Admin\Resources\ImportBatches\Pages\ListImportBatches;
 use App\Models\ImportBatch;
+use App\Services\Kdp\KdpBulkImportService;
 use App\Services\Kdp\KdpReportImportService;
 use App\Services\Kdp\KdpReportTypeDetector;
 use Filament\Forms;
@@ -142,6 +143,9 @@ class ImportBatchResource extends Resource
                     ->action(function (ImportBatch $record): void {
                         try {
                             $batch = app(KdpReportImportService::class)->reprocess($record);
+                            if ($batch->importSession) {
+                                app(KdpBulkImportService::class)->summarize($batch->importSession);
+                            }
                             Notification::make()
                                 ->success()
                                 ->title('Informe reprocesado')

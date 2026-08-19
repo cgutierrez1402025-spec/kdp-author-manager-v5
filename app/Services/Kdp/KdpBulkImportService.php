@@ -117,10 +117,16 @@ class KdpBulkImportService
     {
         $session->refresh();
         $totals = $session->batches()->selectRaw('COALESCE(SUM(imported_rows),0) imported, COALESCE(SUM(skipped_rows),0) skipped, COALESCE(SUM(error_rows),0) errors')->first();
-        $failed = $session->failed_files;
-        $completed = $session->completed_files;
+        $completed = $session->batches()->where('status', 'completed')->count();
+        $failedBatches = $session->batches()->whereIn('status', ['failed', 'needs_review'])->count();
+        $unrepresentedFiles = max(0, $session->total_files - $session->batches()->count() - $session->duplicate_files);
+        $failed = $failedBatches + $unrepresentedFiles;
         $status = $failed === 0 ? 'completed' : ($completed > 0 || $session->duplicate_files > 0 ? 'partial' : 'failed');
-        $session->update(['status' => $status, 'imported_rows' => $totals->imported, 'skipped_rows' => $totals->skipped, 'error_rows' => $totals->errors, 'finished_at' => now()]);
+        $session->update([
+            'status' => $status, 'completed_files' => $completed, 'failed_files' => $failed,
+            'imported_rows' => $totals->imported, 'skipped_rows' => $totals->skipped,
+            'error_rows' => $totals->errors, 'finished_at' => now(),
+        ]);
     }
 
     public function reprocessSession(ImportSession $session): ImportSession

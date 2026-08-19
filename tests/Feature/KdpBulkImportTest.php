@@ -138,6 +138,23 @@ class KdpBulkImportTest extends TestCase
         $this->assertDatabaseCount('kdp_payments', 1);
     }
 
+    public function test_session_summary_is_recalculated_from_its_batches(): void
+    {
+        Storage::fake('local');
+        $user = User::factory()->create();
+        $this->actingAs($user);
+        Storage::disk('local')->put('private/kdp-imports/summary.csv', "Payment Number,Payment Date,Payment Amount,Payment Status\nP-SUMMARY,2026-07-30,10.00,Paid");
+        $service = app(KdpBulkImportService::class);
+        $session = $service->import(['private/kdp-imports/summary.csv'], $user->id, '2026-07-01');
+        $session->update(['status' => 'failed', 'completed_files' => 0, 'failed_files' => 1]);
+
+        $service->summarize($session);
+
+        $this->assertSame('completed', $session->fresh()->status);
+        $this->assertSame(1, $session->fresh()->completed_files);
+        $this->assertSame(0, $session->fresh()->failed_files);
+    }
+
     public function test_author_cannot_import_into_another_users_session(): void
     {
         Storage::fake('local');

@@ -74,10 +74,10 @@ npm run build
 Para comprobar la instalación completa sobre una base prescindible:
 
 ```bash
-php artisan migrate:fresh --seed
+ALLOW_DESTRUCTIVE_DB_COMMANDS=true php artisan migrate:fresh --seed
 ```
 
-`migrate:fresh` elimina todas las tablas de la base configurada. No debe ejecutarse contra una base con información que se quiera conservar.
+`migrate:fresh` elimina todas las tablas de la base configurada. La aplicación lo bloquea por defecto fuera del entorno de pruebas; sólo debe habilitarse expresamente sobre una base temporal o prescindible.
 
 ## Configuración
 
