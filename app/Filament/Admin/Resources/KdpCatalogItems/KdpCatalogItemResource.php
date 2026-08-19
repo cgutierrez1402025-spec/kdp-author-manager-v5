@@ -44,6 +44,8 @@ class KdpCatalogItemResource extends Resource
                 Tables\Columns\TextColumn::make('asin')->label('ASIN')->searchable()->copyable(),
                 Tables\Columns\TextColumn::make('isbn')->label('ISBN')->searchable()->toggleable(),
                 Tables\Columns\TextColumn::make('format')->label('Formato')->badge(),
+                Tables\Columns\TextColumn::make('work.title_public')->label('Obra vinculada')->searchable()->toggleable(),
+                Tables\Columns\TextColumn::make('report_rows_count')->counts('reportRows')->label('Filas origen')->numeric()->sortable(),
                 Tables\Columns\TextColumn::make('marketplaces')->label('Marketplaces')->formatStateUsing(fn ($state) => implode(', ', is_array($state) ? $state : []))->wrap(),
                 Tables\Columns\TextColumn::make('review_status')->label('Estado')->badge()->formatStateUsing(fn (string $state) => match ($state) {
                     'linked' => 'Vinculada','ignored' => 'Ignorada','ambiguous' => 'Ambigua','incomplete' => 'Incompleta',default => 'Pendiente de revisión'
@@ -112,7 +114,7 @@ class KdpCatalogItemResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()
+        return parent::getEloquentQuery()->with(['work', 'publication'])
             ->when(! auth()->user()?->canViewAllAuthorData(), fn (Builder $query) => $query->where('user_id', auth()->id()));
     }
 

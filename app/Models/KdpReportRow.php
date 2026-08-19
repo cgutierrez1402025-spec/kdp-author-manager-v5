@@ -11,12 +11,17 @@ class KdpReportRow extends Model
 
     protected $casts = [
         'report_period' => 'date',
+        'snapshot_at' => 'datetime',
         'transaction_date' => 'date',
         'payment_date' => 'date',
         'average_list_price' => 'decimal:4',
         'average_offer_price' => 'decimal:4',
         'average_delivery_cost' => 'decimal:4',
         'total_earnings' => 'decimal:4',
+        'average_file_size_mb' => 'decimal:4',
+        'income_amount' => 'decimal:4',
+        'net_earnings' => 'decimal:4',
+        'kenp_rate' => 'decimal:8',
         'accrued_royalty' => 'decimal:4',
         'tax_withholding' => 'decimal:4',
         'fx_rate' => 'decimal:8',

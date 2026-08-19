@@ -4,7 +4,7 @@
 
 La integración soportada se basa en archivos descargados manualmente desde KDP Reports. Amazon no documenta una API pública de cuenta KDP para obtener ventas privadas o modificar publicaciones. No se solicitan credenciales, cookies ni sesiones de Amazon.
 
-La interfaz admite hasta 20 archivos CSV/XLSX de 20 MB cada uno o ZIP de hasta 100 MB. Puede detectar automáticamente regalías anteriores, ventas y regalías, pedidos, KENP, pagos o histórico; el usuario todavía puede forzar un tipo común cuando conoce el contenido.
+La interfaz admite hasta 20 archivos CSV/XLSX de 20 MB cada uno o ZIP de hasta 100 MB. Puede detectar automáticamente Panel, regalías anteriores, ventas y regalías, pedidos, KENP, preventas, estimador, pagos o histórico; el usuario todavía puede forzar un tipo común cuando conoce el contenido.
 
 ## Flujo interno
 
@@ -36,13 +36,15 @@ El mes se reconoce en nombres con patrones `AAAA-MM` y `MM-AAAA`, admitiendo gui
 Se almacenan, cuando existen:
 
 - fecha de transacción y periodo;
-- hoja fuente y naturaleza: `royalty`, `order`, `kenp` o `payment`;
+- hoja fuente y naturaleza: `royalty`, `royalty_estimate`, `order`, `preorder`, `kenp` o `payment`;
+- estado de observación `estimated`, `provisional` o `final`, y fecha de captura;
 - título, autor, ASIN, formato y marketplace;
 - moneda, tipo de transacción y tipo de regalía;
 - unidades vendidas, devueltas, netas, pagadas y gratuitas;
 - páginas KENP;
-- precios medios, entrega/producción y regalía;
-- datos de pagos, retención y tipo de cambio;
+- preventas, cancelaciones y preventas netas;
+- precios medios, tamaño de archivo, entrega/producción, ingresos, plan de pago y regalía;
+- datos de pagos, método, periodo de ventas, fuente, retención y tipo de cambio;
 - objeto original y objeto normalizado completos en JSON.
 
 ## Reglas de no duplicación
@@ -58,7 +60,7 @@ El importe y la moneda originales se conservan. Los gráficos agrupan regalías 
 
 ## Asociación con publicaciones
 
-La asociación automática busca el ASIN entre las publicaciones del usuario y, cuando el informe permite inferirlo, el formato. Una fila puede ser válida aunque `publication_id` sea nulo. Esto sucede cuando el libro todavía no existe en el catálogo interno o el formato no coincide.
+La asociación automática busca el ASIN entre las publicaciones del usuario y, cuando el informe permite inferirlo, el formato. Si no existe, una fila de libro crea una publicación provisional; una fila agregada de pago puede permanecer sin publicación.
 
 Los títulos no vinculados se materializan automáticamente en `works`, `publications` y `kdp_metadata`, además de aparecer en **Publicaciones → Catálogo detectado KDP**. La obra y la publicación usan el estado `catalog_review`; idioma, manuscrito, género y otros datos ausentes quedan en `NULL` hasta la revisión.
 
@@ -86,6 +88,14 @@ Procedimiento recomendado:
 **Reprocesar** verifica la huella SHA-256 y bloquea el lote antes de sustituir datos. Dentro de una única transacción reconstruye filas, errores y proyecciones de pagos, recalcula el catálogo afectado y elimina únicamente elementos pendientes que hayan quedado huérfanos. Las obras, publicaciones y decisiones revisadas por el usuario no se eliminan. Si falta el archivo, ha cambiado o el parser falla, se revierte la transacción y se conserva íntegramente el resultado anterior.
 
 En **Sesiones de importación**, **Reprocesar sesión** repite todos los lotes con una transacción independiente por archivo. Un fallo conserva ese archivo y no impide actualizar los demás; la sesión termina `partial` cuando corresponde.
+
+Para reprocesar desde consola todos los archivos originales conservados y volver a detectar lotes antiguos:
+
+```bash
+php artisan kdp:reprocess-imports
+php artisan kdp:reprocess-imports --user=2
+php artisan kdp:reprocess-imports --type=orders
+```
 
 ## Estados y contadores
 

@@ -8,17 +8,30 @@ use RuntimeException;
 class KdpReportTypeDetector
 {
     private const SIGNATURES = [
-        'payments' => ['payment number', 'payment date', 'payment amount', 'payment status'],
-        'kenp' => ['kenp read', 'kenp pages read', 'paginas kenp leidas'],
-        'orders' => ['units ordered', 'unidades pedidas', 'orders'],
-        'sales_royalties' => ['transaction type', 'royalty type', 'average offer price without tax'],
-        'prior_royalties' => ['total earnings', 'net units sold', 'units refunded'],
+        'payments' => ['payment number', 'numero de pago', 'payment date', 'fecha de pago', 'payment amount', 'importe del pago', 'payment status', 'estado del pago'],
+        'preorders' => ['pre-order units', 'pre-order cancellations', 'unidades de preventas', 'cancelaciones de preventas'],
+        'royalties_estimator' => ['estimated royalties', 'royalties estimator', 'regalias estimadas', 'estimador de regalias'],
+        'dashboard' => ['top-earning books', 'estimated royalties', 'top formats', 'libros con mas ingresos'],
+        'kenp' => ['kenp read', 'kenp pages read', 'paginas kenp leidas', 'kenp leidas'],
+        'orders' => ['paid units', 'free units', 'unidades pagadas', 'unidades gratuitas', 'orders', 'pedidos'],
+        'sales_royalties' => ['transaction type', 'tipo de transaccion', 'royalty type', 'tipo de regalia', 'average offer price without tax', 'precio de oferta medio sin impuestos'],
+        'prior_royalties' => ['total earnings', 'ingresos totales', 'net units sold', 'unidades netas vendidas', 'units refunded', 'unidades devueltas'],
         'historical' => ['royalty date', 'accrued royalty', 'historical'],
     ];
 
     public function detect(string $path): array
     {
         $tables = $this->tables($path);
+        $sheets = collect(array_keys($tables))->map(fn (string $sheet) => $this->normalize($sheet));
+        $isLegacyWorkbook = $sheets->contains(fn (string $sheet) => str_contains($sheet, 'ventas combinadas'))
+            && $sheets->contains(fn (string $sheet) => str_contains($sheet, 'pedidos'))
+            && $sheets->contains(fn (string $sheet) => str_contains($sheet, 'kenp'));
+        if ($isLegacyWorkbook) {
+            return [
+                'type' => 'sales_royalties', 'confidence' => 100.0,
+                'period' => $this->periodFromFilename(basename($path)), 'sheets' => array_keys($tables),
+            ];
+        }
         $haystack = collect($tables)->flatMap(fn (array $rows, string $sheet) => [$sheet, ...collect(array_slice($rows, 0, 25))->flatten()->all()])
             ->map(fn ($value) => $this->normalize((string) $value))->filter()->unique();
 
@@ -28,7 +41,7 @@ class KdpReportTypeDetector
 
         $type = $scores->keys()->first();
         $score = (int) $scores->first();
-        $maximum = count(self::SIGNATURES[$type] ?? []);
+        $maximum = min(4, count(self::SIGNATURES[$type] ?? []));
 
         return [
             'type' => $score > 0 ? $type : null,

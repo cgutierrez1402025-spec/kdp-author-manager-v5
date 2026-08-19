@@ -13,6 +13,8 @@
 - [`RESULTADO_IMPORTACION_MULTIPLE_KDP.md`](RESULTADO_IMPORTACION_MULTIPLE_KDP.md): sesiones, detección automática, ZIP, seguridad y pruebas de la carga múltiple.
 - [`RESULTADO_PROMOCION_CATALOGO_Y_PAGOS_KDP.md`](RESULTADO_PROMOCION_CATALOGO_Y_PAGOS_KDP.md): creación segura de obras desde el catálogo y proyección conciliable de pagos.
 - [`RESULTADO_MATERIALIZACION_AUTOMATICA_KDP.md`](RESULTADO_MATERIALIZACION_AUTOMATICA_KDP.md): tablas afectadas, agrupación, datos provisionales y backfill automático.
+- [`AUDITORIA_CONEXION_CATALOGO_KDP.md`](AUDITORIA_CONEXION_CATALOGO_KDP.md): trazabilidad con obras y publicaciones, cobertura real de campos y mejoras propuestas.
+- [`MATRIZ_ACCIONES_POR_INFORME_KDP.md`](MATRIZ_ACCIONES_POR_INFORME_KDP.md): tablas, operaciones e integridad necesarias para cada descarga oficial de Amazon KDP.
 - [`INFORME_ESTABILIZACION_INTEGRAL_2026.md`](INFORME_ESTABILIZACION_INTEGRAL_2026.md): correcciones aplicadas a integridad, privacidad, operación y CI.
 - [`PLAN_MEJORAS_DERIVADAS_MANUAL_BBDD.md`](PLAN_MEJORAS_DERIVADAS_MANUAL_BBDD.md): hoja de ruta contrastada con el manual profesional HTML aportado.
 - [`AUDITORIA_PAGOS_KDP.md`](AUDITORIA_PAGOS_KDP.md): limitaciones de pagos y diseño de conciliación pago‑obra.

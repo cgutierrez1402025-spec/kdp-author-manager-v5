@@ -21,6 +21,7 @@ Fecha: 19 de agosto de 2026
 15. Promoción del catálogo KDP: creación transaccional de obra/idioma/edición, publicación sin manuscrito ficticio, permisos y materialización idempotente de pagos.
 16. Reprocesado seguro: idempotencia, SHA-256, bloqueo, rollback con datos anteriores, limpieza de derivados y sesión con fallos parciales.
 17. Materialización automática del catálogo: creación provisional de obras, ediciones, metadatos y marketplaces; agrupación de formatos, separación de registros sin título e idempotencia.
+18. Tipos KDP ampliados: preventas, estimaciones aisladas, pagos completos, campos históricos normalizados y filtrado semántico de hojas XLSX.
 
 ## Errores corregidos
 
@@ -35,8 +36,8 @@ Fecha: 19 de agosto de 2026
 
 ## Resultado final
 
-- 86 pruebas superadas.
-- 601 aserciones correctas.
+- 90 pruebas superadas.
+- 619 aserciones correctas.
 - 22 listados y 21 formularios de edición probados con datos sembrados.
 - 105 relaciones Eloquent resueltas correctamente.
 - Migración limpia y seeders correctos.

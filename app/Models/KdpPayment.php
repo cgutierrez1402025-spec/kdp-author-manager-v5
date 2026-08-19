@@ -10,7 +10,12 @@ class KdpPayment extends Model
 {
     protected $guarded = [];
 
-    protected $casts = ['payment_date' => 'date', 'accrued_royalty' => 'decimal:4', 'tax_withholding' => 'decimal:4', 'fx_rate' => 'decimal:8', 'payment_amount' => 'decimal:4', 'raw_data' => 'array'];
+    protected $casts = [
+        'payment_date' => 'date', 'sales_period_start' => 'date', 'sales_period_end' => 'date',
+        'net_earnings' => 'decimal:4', 'accrued_royalty' => 'decimal:4',
+        'tax_withholding' => 'decimal:4', 'fx_rate' => 'decimal:8',
+        'payment_amount' => 'decimal:4', 'raw_data' => 'array',
+    ];
 
     public function user(): BelongsTo
     {

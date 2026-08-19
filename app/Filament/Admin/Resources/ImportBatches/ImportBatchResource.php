@@ -50,6 +50,9 @@ class ImportBatchResource extends Resource
                             'orders' => 'Pedidos',
                             'kenp' => 'Páginas KENP leídas',
                             'payments' => 'Pagos',
+                            'preorders' => 'Preventas',
+                            'royalties_estimator' => 'Estimador de regalías',
+                            'dashboard' => 'Panel descargado',
                             'historical' => 'Histórico',
                         ])
                         ->default('auto')
@@ -110,6 +113,9 @@ class ImportBatchResource extends Resource
                     'orders' => 'Pedidos',
                     'kenp' => 'KENP',
                     'payments' => 'Pagos',
+                    'preorders' => 'Preventas',
+                    'royalties_estimator' => 'Estimador de regalías',
+                    'dashboard' => 'Panel',
                     'historical' => 'Histórico',
                     'unknown' => 'Pendiente de revisión',
                     default => $state,

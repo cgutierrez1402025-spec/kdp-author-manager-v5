@@ -248,6 +248,21 @@ class ComprehensiveDemoSeeder extends Seeder
                 'raw_data' => json_encode(['ASIN' => $publication->asin, 'Total Earnings' => $royalty->total_royalty]),
                 'normalized_data' => json_encode(['asin' => $publication->asin, 'total_earnings' => $royalty->total_royalty]),
             ]);
+            $estimateRow = $this->record('kdp_report_rows', ['user_id' => $author, 'row_fingerprint' => hash('sha256', 'demo-kdp-estimate-2026')], [
+                'import_batch_id' => $batch, 'publication_id' => $publication->id, 'kdp_catalog_item_id' => $catalogItem,
+                'report_type' => 'royalties_estimator', 'row_kind' => 'royalty_estimate', 'observation_status' => 'estimated',
+                'snapshot_at' => now(), 'report_period' => '2026-01-01', 'title' => $work->title_public,
+                'author' => $work->author_name, 'asin' => $publication->asin, 'format' => $publication->format,
+                'marketplace' => 'Amazon.es', 'currency' => 'EUR', 'income_amount' => 252.40, 'kenp_rate' => 0.0045,
+                'raw_data' => json_encode(['Estimated Royalties' => 252.40, 'KENP Rate' => 0.0045]),
+                'normalized_data' => json_encode(['income_amount' => 252.40, 'kenp_rate' => 0.0045]),
+            ]);
+            $this->record('kdp_royalty_estimates', ['kdp_report_row_id' => $estimateRow], [
+                'user_id' => $author, 'publication_id' => $publication->id, 'marketplace_id' => $marketplace->id,
+                'import_batch_id' => $batch, 'period' => '2026-01-01', 'snapshot_at' => now(),
+                'estimated_amount' => 252.40, 'currency' => 'EUR', 'kenp_rate' => 0.0045,
+                'filters' => json_encode(['report_type' => 'royalties_estimator']),
+            ]);
             $kdpPayment = $this->record('kdp_payments', ['user_id' => $author, 'payment_number' => 'DEMO-PAY-2026-01', 'currency' => 'EUR'], [
                 'latest_import_batch_id' => $batch, 'marketplace' => 'Amazon.es', 'status' => 'Paid',
                 'payment_date' => '2026-03-29', 'accrued_royalty' => 245.80, 'tax_withholding' => 0,

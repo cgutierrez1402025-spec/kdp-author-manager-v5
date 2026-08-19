@@ -28,7 +28,11 @@ class KdpPaymentResource extends Resource
         return $table->defaultSort('payment_date', 'desc')->columns([
             Tables\Columns\TextColumn::make('payment_number')->label('Número')->searchable(),
             Tables\Columns\TextColumn::make('payment_date')->label('Fecha')->date('d/m/Y'),
+            Tables\Columns\TextColumn::make('payment_method')->label('Método')->toggleable(),
+            Tables\Columns\TextColumn::make('sales_period_start')->label('Periodo')->formatStateUsing(fn ($state, KdpPayment $record) => $state ? $record->sales_period_start->format('m/Y') : '—'),
             Tables\Columns\TextColumn::make('marketplace')->label('Marketplace'),
+            Tables\Columns\TextColumn::make('source')->label('Fuente')->toggleable(),
+            Tables\Columns\TextColumn::make('net_earnings')->label('Neto')->money(fn ($record) => $record->currency)->toggleable(),
             Tables\Columns\TextColumn::make('payment_amount')->label('Importe')->money(fn ($record) => $record->currency),
             Tables\Columns\TextColumn::make('tax_withholding')->label('Retención')->numeric(2),
             Tables\Columns\TextColumn::make('status')->label('Estado')->badge(),

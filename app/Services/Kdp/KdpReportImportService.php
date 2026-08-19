@@ -8,6 +8,7 @@ use App\Models\KdpCatalogItem;
 use App\Models\KdpPayment;
 use App\Models\KdpPaymentAllocation;
 use App\Models\KdpReportRow;
+use App\Models\KdpRoyaltyEstimate;
 use App\Models\Publication;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -33,19 +34,31 @@ class KdpReportImportService
         'net_units_sold' => ['net units sold', 'unidades netas vendidas', 'unidades netas'],
         'paid_units' => ['paid units', 'unidades pagadas'],
         'free_units' => ['free units', 'unidades gratuitas'],
+        'preorder_units' => ['pre-order units', 'preorder units', 'unidades de preventas', 'unidades de preventa'],
+        'preorder_cancellations' => ['pre-order cancellations', 'preorder cancellations', 'cancelaciones de preventas', 'cancelaciones de preventa'],
+        'net_preorder_units' => ['pre-order units net of cancellations', 'net pre-order units', 'unidades de preventas excluidas las cancelaciones'],
         'kenp_read' => ['kenp read', 'kenp pages read', 'paginas kenp leidas'],
+        'combined_units_or_kenp' => ['net units sold or kenp read', 'unidades netas vendidas o kenp leidas**', 'unidades netas vendidas o kenp leidas'],
         'average_list_price' => ['average list price without tax', 'precio medio de lista sin impuestos'],
         'average_offer_price' => ['average offer price without tax', 'precio medio de oferta sin impuestos'],
         'average_delivery_cost' => ['average delivery cost', 'coste medio de entrega', 'gasto medio de envio', 'gasto medio de entrega/produccion', 'gasto de produccion medio'],
+        'average_file_size_mb' => ['average file size', 'average file size (mb)', 'tamano medio del archivo (mb)'],
         'total_earnings' => ['total earnings', 'regalias', 'royalty', 'ganancias totales', 'ingresos totales'],
+        'income_amount' => ['income', 'income amount', 'ingresos', 'estimated royalties', 'estimated royalty', 'regalias estimadas'],
+        'payment_plan' => ['payment plan', 'plan de pago'],
         'payment_number' => ['payment number', 'numero de pago'],
         'payment_status' => ['payment status', 'estado del pago'],
         'payment_date' => ['payment date', 'fecha de pago'],
+        'payment_method' => ['payment method', 'metodo de pago'],
+        'net_earnings' => ['net earnings', 'ingresos netos'],
+        'sales_period' => ['sales period', 'periodo de ventas'],
+        'payment_source' => ['source', 'fuente'],
         'accrued_royalty' => ['accrued royalty', 'regalia acumulada', 'regalias acumuladas'],
         'tax_withholding' => ['tax withholding', 'retencion fiscal', 'retencion de impuestos'],
         'fx_rate' => ['fx rate', 'tipo de cambio'],
         'payment_amount' => ['payment amount', 'importe del pago'],
-        'transaction_date' => ['royalty date', 'fecha de las regalias', 'date', 'fecha'],
+        'transaction_date' => ['royalty date', 'fecha de las regalias', 'order date', 'fecha del pedido', 'date', 'fecha'],
+        'kenp_rate' => ['kenp rate', 'tarifa kenp'],
     ];
 
     public function import(ImportBatch $batch): ImportBatch
@@ -94,6 +107,14 @@ class KdpReportImportService
                 if (! is_file($path) || hash_file('sha256', $path) !== $lockedBatch->file_hash) {
                     throw new RuntimeException('El archivo original no existe o no coincide con su huella SHA-256.');
                 }
+
+                $detection = app(KdpReportTypeDetector::class)->detect($path);
+                $lockedBatch->update([
+                    'detected_import_type' => $detection['type'],
+                    'detection_confidence' => $detection['confidence'],
+                    'import_type' => $lockedBatch->import_type === 'unknown' && $detection['type']
+                        ? $detection['type'] : $lockedBatch->import_type,
+                ]);
 
                 $lockedBatch->reportRows()->delete();
                 $lockedBatch->errors()->delete();
@@ -189,7 +210,10 @@ class KdpReportImportService
             }
 
             try {
-                $normalized = $this->normalizeRow($raw, $sheet);
+                $normalized = $this->normalizeRow($raw, $sheet, $batch->import_type);
+                if (in_array($batch->import_type, ['dashboard', 'royalties_estimator', 'kenp'], true)) {
+                    $normalized['snapshot_at'] = $batch->created_at;
+                }
                 $fingerprint = hash('sha256', implode('|', [
                     $batch->user_id,
                     $batch->import_type,
@@ -223,6 +247,7 @@ class KdpReportImportService
                     $reportRow->refresh();
                 }
                 $this->materializePayment($batch, $reportRow);
+                $this->materializeEstimate($batch, $reportRow);
                 $counters['imported_rows']++;
             } catch (Throwable $exception) {
                 ImportError::create([
@@ -250,6 +275,10 @@ class KdpReportImportService
             [
                 'latest_import_batch_id' => $batch->id, 'marketplace' => $row->marketplace,
                 'status' => $row->payment_status, 'payment_date' => $row->payment_date,
+                'payment_method' => $row->payment_method, 'net_earnings' => $row->net_earnings,
+                'sales_period_start' => $this->salesPeriod($row->sales_period)[0],
+                'sales_period_end' => $this->salesPeriod($row->sales_period)[1],
+                'source' => $row->payment_source,
                 'accrued_royalty' => $row->accrued_royalty, 'tax_withholding' => $row->tax_withholding,
                 'fx_rate' => $row->fx_rate, 'payment_amount' => $row->payment_amount,
                 'raw_data' => $row->raw_data,
@@ -266,6 +295,22 @@ class KdpReportImportService
                 'confidence' => $row->publication_id ? 100 : null,
             ],
         );
+    }
+
+    public function materializeEstimate(ImportBatch $batch, KdpReportRow $row): void
+    {
+        if ($row->row_kind !== 'royalty_estimate') {
+            return;
+        }
+
+        KdpRoyaltyEstimate::updateOrCreate(['kdp_report_row_id' => $row->id], [
+            'user_id' => $batch->user_id, 'publication_id' => $row->publication_id,
+            'marketplace_id' => $row->publication?->marketplace_id, 'import_batch_id' => $batch->id,
+            'period' => $row->report_period, 'snapshot_at' => $row->snapshot_at,
+            'estimated_amount' => $row->income_amount ?? $row->total_earnings,
+            'currency' => $row->currency, 'kenp_rate' => $row->kenp_rate,
+            'filters' => ['report_type' => $batch->import_type],
+        ]);
     }
 
     public function materializeExistingPayments(?int $userId = null): int
@@ -304,7 +349,7 @@ class KdpReportImportService
     /** @param array<string, mixed> $raw
      * @return array<string, mixed>
      */
-    private function normalizeRow(array $raw, string $sheet): array
+    private function normalizeRow(array $raw, string $sheet, string $reportType): array
     {
         $row = [];
         foreach (self::ALIASES as $field => $aliases) {
@@ -321,16 +366,23 @@ class KdpReportImportService
             throw new RuntimeException('La fila no contiene ASIN ni número de pago.');
         }
 
-        foreach (['units_sold', 'units_refunded', 'net_units_sold', 'paid_units', 'free_units', 'kenp_read'] as $field) {
+        foreach (['units_sold', 'units_refunded', 'net_units_sold', 'paid_units', 'free_units', 'preorder_units', 'preorder_cancellations', 'net_preorder_units', 'kenp_read', 'combined_units_or_kenp'] as $field) {
             $row[$field] = $this->number($row[$field] ?? null, true);
         }
-        foreach (['average_list_price', 'average_offer_price', 'average_delivery_cost', 'total_earnings', 'accrued_royalty', 'tax_withholding', 'fx_rate', 'payment_amount'] as $field) {
+        foreach (['average_list_price', 'average_offer_price', 'average_delivery_cost', 'average_file_size_mb', 'total_earnings', 'income_amount', 'net_earnings', 'accrued_royalty', 'tax_withholding', 'fx_rate', 'payment_amount', 'kenp_rate'] as $field) {
             $row[$field] = $this->number($row[$field] ?? null);
         }
 
         $row['asin'] = isset($row['asin']) ? strtoupper($row['asin']) : null;
         $row['currency'] = isset($row['currency']) ? strtoupper(substr($row['currency'], 0, 3)) : null;
-        $row['row_kind'] = $this->rowKind($row, $sheet);
+        $row['row_kind'] = $this->rowKind($row, $sheet, $reportType);
+        $row['observation_status'] = match ($reportType) {
+            'dashboard', 'royalties_estimator' => 'estimated',
+            'kenp' => 'provisional',
+            default => 'final',
+        };
+        $row['source_generation'] = in_array($reportType, ['sales_royalties', 'historical'], true) ? 'legacy' : 'current';
+        $row['snapshot_at'] = null;
         $row['format'] = $this->format($row['format'] ?? null, $row['transaction_type'] ?? null, $sheet);
         $row['payment_date'] = $this->date($row['payment_date'] ?? null);
         $row['transaction_date'] = $this->date($row['transaction_date'] ?? null);
@@ -443,13 +495,18 @@ class KdpReportImportService
     }
 
     /** @param array<string, mixed> $row */
-    private function rowKind(array $row, string $sheet): string
+    private function rowKind(array $row, string $sheet, string $reportType): string
     {
         $sheet = $this->normalizeHeader($sheet);
 
         return match (true) {
             isset($row['payment_number']) => 'payment',
+            $reportType === 'preorders' || isset($row['preorder_units']) || isset($row['preorder_cancellations']) => 'preorder',
             str_contains($sheet, 'kenp') => 'kenp',
+            $reportType === 'royalties_estimator' => 'royalty_estimate',
+            $reportType === 'dashboard' && isset($row['kenp_read']) => 'kenp',
+            $reportType === 'dashboard' && (isset($row['paid_units']) || isset($row['free_units'])) => 'order',
+            $reportType === 'dashboard' => 'royalty_estimate',
             isset($row['paid_units']) || isset($row['free_units']) => 'order',
             default => 'royalty',
         };
@@ -465,6 +522,18 @@ class KdpReportImportService
 
         if ($hasCombinedRoyalties && str_starts_with($sheet, 'regalias de')) {
             return false;
+        }
+
+        if ($sheet !== 'csv') {
+            if ($reportType === 'orders') {
+                return str_contains($sheet, 'pedido') || str_contains($sheet, 'order');
+            }
+            if ($reportType === 'kenp') {
+                return str_contains($sheet, 'kenp');
+            }
+            if ($reportType === 'preorders') {
+                return str_contains($sheet, 'preventa') || str_contains($sheet, 'pre-order') || str_contains($sheet, 'preorder');
+            }
         }
 
         if ($reportType === 'sales_royalties' && str_contains($sheet, 'pedidos')) {
@@ -487,6 +556,22 @@ class KdpReportImportService
             return Carbon::parse((string) $value)->toDateString();
         } catch (Throwable) {
             throw new RuntimeException("Fecha no válida: {$value}");
+        }
+    }
+
+    /** @return array{0: ?string, 1: ?string} */
+    private function salesPeriod(?string $value): array
+    {
+        if (! $value) {
+            return [null, null];
+        }
+
+        try {
+            $start = Carbon::parse($value)->startOfMonth();
+
+            return [$start->toDateString(), $start->copy()->endOfMonth()->toDateString()];
+        } catch (Throwable) {
+            return [null, null];
         }
     }
 }
