@@ -25,6 +25,7 @@ use App\Filament\Admin\Resources\Tasks\TaskResource;
 use App\Filament\Admin\Resources\Works\WorkResource;
 use App\Filament\Admin\Widgets\ActivePromotionsWidget;
 use App\Filament\Admin\Widgets\ExpiringKdpSelectWidget;
+use App\Filament\Admin\Widgets\KdpImportedDataWidget;
 use App\Filament\Admin\Widgets\MyTasksWidget;
 use App\Filament\Admin\Widgets\RecentActivityWidget;
 use App\Filament\Admin\Widgets\RevenueChartWidget;
@@ -106,6 +107,7 @@ class AdminPanelProvider extends PanelProvider
                 UpcomingEventsWidget::class,
                 RevenueChartWidget::class,
                 TopWorksByRevenueWidget::class,
+                KdpImportedDataWidget::class,
                 ActivePromotionsWidget::class,
                 ExpiringKdpSelectWidget::class,
                 RecentActivityWidget::class,

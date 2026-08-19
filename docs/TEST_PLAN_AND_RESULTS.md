@@ -1,6 +1,6 @@
 # Plan de pruebas y resultados
 
-Fecha: 17 de agosto de 2026
+Fecha: 19 de agosto de 2026
 
 ## Cobertura ejecutada
 
@@ -8,12 +8,13 @@ Fecha: 17 de agosto de 2026
 2. Integridad referencial mediante `PRAGMA foreign_key_check`.
 3. Autenticación, registro, recuperación de contraseña, roles y aislamiento por autor.
 4. Dashboard con promociones, tareas, eventos, ingresos y periodos KDP Select reales.
-5. Listado, creación y edición de los 19 recursos Filament registrados.
+5. Listado, creación y edición de los recursos Filament registrados.
 6. Resolución de 105 relaciones Eloquent contra datos coherentes.
 7. Obras, idiomas, versiones, capítulos y publicaciones.
 8. Regalías, importación atómica, promociones y ROI.
-9. Servicio de IA con proveedor simulado y ausencia controlada de credenciales.
-10. Sintaxis PHP, validez de Composer y compilación Vite de producción.
+9. Importación KDP CSV/XLSX, asociación por ASIN/formato, idempotencia, reprocesado y gráficos.
+10. Servicio de IA con proveedor simulado y ausencia controlada de credenciales.
+11. Sintaxis PHP, validez de Composer y compilación Vite de producción.
 
 ## Errores corregidos
 
@@ -28,10 +29,11 @@ Fecha: 17 de agosto de 2026
 
 ## Resultado final
 
-- 50 pruebas superadas.
-- 396 aserciones correctas tras retirar recursos obsoletos no registrados.
+- 62 pruebas superadas.
+- 447 aserciones correctas.
 - 19 listados y 19 formularios de edición probados con datos sembrados.
 - 105 relaciones Eloquent resueltas correctamente.
 - Migración limpia y seeders correctos.
 - Ninguna violación de claves foráneas.
 - Build de producción correcto.
+- Informe KDP real reprocesado: 39 filas canónicas, 0 duplicadas y 0 errores.

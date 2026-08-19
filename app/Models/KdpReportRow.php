@@ -11,6 +11,7 @@ class KdpReportRow extends Model
 
     protected $casts = [
         'report_period' => 'date',
+        'transaction_date' => 'date',
         'payment_date' => 'date',
         'average_list_price' => 'decimal:4',
         'average_offer_price' => 'decimal:4',

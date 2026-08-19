@@ -2,6 +2,13 @@
 
 ## Documentos vigentes
 
+- [`MANUAL_DE_USUARIO.md`](MANUAL_DE_USUARIO.md): funcionamiento completo para autores y administradores.
+- [`IMPORTACION_AMAZON_KDP.md`](IMPORTACION_AMAZON_KDP.md): formatos, normalización, duplicados y reprocesado.
+- [`ARQUITECTURA_Y_MODELO_DE_DATOS.md`](ARQUITECTURA_Y_MODELO_DE_DATOS.md): componentes, dominios y fuentes del panel.
+- [`OPERACION_DESPLIEGUE_Y_MANTENIMIENTO.md`](OPERACION_DESPLIEGUE_Y_MANTENIMIENTO.md): instalación, despliegue, almacenamiento y copias.
+- [`SEGURIDAD_PRIVACIDAD_Y_ROLES.md`](SEGURIDAD_PRIVACIDAD_Y_ROLES.md): autorización, archivos, IA y RGPD.
+- [`PRUEBAS_Y_RESOLUCION_DE_PROBLEMAS.md`](PRUEBAS_Y_RESOLUCION_DE_PROBLEMAS.md): validación y diagnóstico.
+- [`INFORME_PANEL_DECISIONES_KDP_IA.md`](INFORME_PANEL_DECISIONES_KDP_IA.md): informe y hoja de ruta que originan la v5.
 - [`TEST_PLAN_AND_RESULTS.md`](TEST_PLAN_AND_RESULTS.md): cobertura y último resultado verificado.
 - [`FORM_RELATIONSHIP_AUDIT.md`](FORM_RELATIONSHIP_AUDIT.md): asociaciones entre entidades y formularios Filament.
 - [`ERROR_REVIEW_PLAN.md`](ERROR_REVIEW_PLAN.md): estrategia de revisión y regresión.

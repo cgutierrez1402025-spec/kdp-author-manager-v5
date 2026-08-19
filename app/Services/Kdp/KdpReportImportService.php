@@ -17,20 +17,22 @@ class KdpReportImportService
 {
     private const ALIASES = [
         'title' => ['title', 'titulo'],
-        'author' => ['author', 'autor'],
-        'asin' => ['asin'],
+        'author' => ['author', 'autor', 'nombre del autor'],
+        'asin' => ['asin', 'asin/isbn'],
         'format' => ['format', 'formato'],
-        'marketplace' => ['marketplace', 'mercado'],
+        'marketplace' => ['marketplace', 'mercado', 'tienda'],
         'currency' => ['currency', 'moneda'],
         'transaction_type' => ['transaction type', 'tipo de transaccion'],
         'royalty_type' => ['royalty type', 'tipo de regalia'],
         'units_sold' => ['units sold', 'unidades vendidas'],
-        'units_refunded' => ['units refunded', 'unidades reembolsadas', 'devoluciones'],
+        'units_refunded' => ['units refunded', 'unidades reembolsadas', 'unidades devueltas', 'devoluciones'],
         'net_units_sold' => ['net units sold', 'unidades netas vendidas', 'unidades netas'],
+        'paid_units' => ['paid units', 'unidades pagadas'],
+        'free_units' => ['free units', 'unidades gratuitas'],
         'kenp_read' => ['kenp read', 'kenp pages read', 'paginas kenp leidas'],
         'average_list_price' => ['average list price without tax', 'precio medio de lista sin impuestos'],
         'average_offer_price' => ['average offer price without tax', 'precio medio de oferta sin impuestos'],
-        'average_delivery_cost' => ['average delivery cost', 'coste medio de entrega'],
+        'average_delivery_cost' => ['average delivery cost', 'coste medio de entrega', 'gasto medio de envio', 'gasto medio de entrega/produccion', 'gasto de produccion medio'],
         'total_earnings' => ['total earnings', 'regalias', 'royalty', 'ganancias totales', 'ingresos totales'],
         'payment_number' => ['payment number', 'numero de pago'],
         'payment_status' => ['payment status', 'estado del pago'],
@@ -39,6 +41,7 @@ class KdpReportImportService
         'tax_withholding' => ['tax withholding', 'retencion fiscal', 'retencion de impuestos'],
         'fx_rate' => ['fx rate', 'tipo de cambio'],
         'payment_amount' => ['payment amount', 'importe del pago'],
+        'transaction_date' => ['royalty date', 'fecha de las regalias', 'date', 'fecha'],
     ];
 
     public function import(ImportBatch $batch): ImportBatch
@@ -52,7 +55,13 @@ class KdpReportImportService
             $counters = ['total_rows' => 0, 'imported_rows' => 0, 'skipped_rows' => 0, 'error_rows' => 0];
 
             DB::transaction(function () use ($batch, $tables, &$counters): void {
+                $hasCombinedRoyalties = collect(array_keys($tables))
+                    ->contains(fn (string $sheet): bool => $this->normalizeHeader($sheet) === 'ventas combinadas');
+
                 foreach ($tables as $sheet => $rows) {
+                    if (! $this->shouldImportSheet($sheet, $hasCombinedRoyalties, $batch->import_type)) {
+                        continue;
+                    }
                     $this->importTable($batch, $sheet, $rows, $counters);
                 }
             });
@@ -64,6 +73,27 @@ class KdpReportImportService
         }
 
         return $batch->refresh();
+    }
+
+    public function reprocess(ImportBatch $batch): ImportBatch
+    {
+        abort_unless($batch->user_id === auth()->id() || auth()->user()?->canViewAllAuthorData(), 403);
+
+        DB::transaction(function () use ($batch): void {
+            $batch->reportRows()->delete();
+            $batch->errors()->delete();
+            $batch->update([
+                'status' => 'pending',
+                'total_rows' => 0,
+                'imported_rows' => 0,
+                'skipped_rows' => 0,
+                'error_rows' => 0,
+                'started_at' => null,
+                'finished_at' => null,
+            ]);
+        });
+
+        return $this->import($batch->refresh());
     }
 
     /** @return array<string, array<int, array<int, string|null>>> */
@@ -118,7 +148,7 @@ class KdpReportImportService
             }
 
             try {
-                $normalized = $this->normalizeRow($raw);
+                $normalized = $this->normalizeRow($raw, $sheet);
                 $fingerprint = hash('sha256', implode('|', [
                     $batch->user_id,
                     $batch->import_type,
@@ -138,6 +168,7 @@ class KdpReportImportService
                     'publication_id' => $this->publicationId($batch, $normalized),
                     'row_fingerprint' => $fingerprint,
                     'report_type' => $batch->import_type,
+                    'source_sheet' => $sheet,
                     'report_period' => $batch->report_period,
                     'raw_data' => ['sheet' => $sheet, 'row' => $index + 1, 'values' => $raw],
                     'normalized_data' => $normalized,
@@ -179,7 +210,7 @@ class KdpReportImportService
     /** @param array<string, mixed> $raw
      * @return array<string, mixed>
      */
-    private function normalizeRow(array $raw): array
+    private function normalizeRow(array $raw, string $sheet): array
     {
         $row = [];
         foreach (self::ALIASES as $field => $aliases) {
@@ -196,7 +227,7 @@ class KdpReportImportService
             throw new RuntimeException('La fila no contiene ASIN ni número de pago.');
         }
 
-        foreach (['units_sold', 'units_refunded', 'net_units_sold', 'kenp_read'] as $field) {
+        foreach (['units_sold', 'units_refunded', 'net_units_sold', 'paid_units', 'free_units', 'kenp_read'] as $field) {
             $row[$field] = $this->number($row[$field] ?? null, true);
         }
         foreach (['average_list_price', 'average_offer_price', 'average_delivery_cost', 'total_earnings', 'accrued_royalty', 'tax_withholding', 'fx_rate', 'payment_amount'] as $field) {
@@ -205,8 +236,10 @@ class KdpReportImportService
 
         $row['asin'] = isset($row['asin']) ? strtoupper($row['asin']) : null;
         $row['currency'] = isset($row['currency']) ? strtoupper(substr($row['currency'], 0, 3)) : null;
-        $row['format'] = $this->format($row['format'] ?? $row['royalty_type'] ?? null);
+        $row['row_kind'] = $this->rowKind($row, $sheet);
+        $row['format'] = $this->format($row['format'] ?? null, $row['transaction_type'] ?? null, $sheet);
         $row['payment_date'] = $this->date($row['payment_date'] ?? null);
+        $row['transaction_date'] = $this->date($row['transaction_date'] ?? null);
 
         return $row;
     }
@@ -252,16 +285,49 @@ class KdpReportImportService
         return $integer ? (int) round((float) $value) : (float) $value;
     }
 
-    private function format(?string $value): ?string
+    private function format(?string $value, ?string $transactionType, string $sheet): ?string
     {
-        $value = $this->normalizeHeader((string) $value);
+        $value = $this->normalizeHeader(implode(' ', array_filter([$value, $transactionType, $sheet])));
 
         return match (true) {
             str_contains($value, 'paperback'), str_contains($value, 'tapa blanda') => 'paperback',
             str_contains($value, 'hardcover'), str_contains($value, 'tapa dura') => 'hardcover',
             str_contains($value, 'ebook'), str_contains($value, 'kindle') => 'ebook',
-            default => $value !== '' ? $value : null,
+            str_contains($value, 'ventas combinadas'), str_contains($value, 'pedidos procesados') => 'ebook',
+            default => null,
         };
+    }
+
+    /** @param array<string, mixed> $row */
+    private function rowKind(array $row, string $sheet): string
+    {
+        $sheet = $this->normalizeHeader($sheet);
+
+        return match (true) {
+            isset($row['payment_number']) => 'payment',
+            str_contains($sheet, 'kenp') => 'kenp',
+            isset($row['paid_units']) || isset($row['free_units']) => 'order',
+            default => 'royalty',
+        };
+    }
+
+    private function shouldImportSheet(string $sheet, bool $hasCombinedRoyalties, string $reportType): bool
+    {
+        $sheet = $this->normalizeHeader($sheet);
+
+        if (str_contains($sheet, 'definiciones') || $sheet === 'resumen') {
+            return false;
+        }
+
+        if ($hasCombinedRoyalties && str_starts_with($sheet, 'regalias de')) {
+            return false;
+        }
+
+        if ($reportType === 'sales_royalties' && str_contains($sheet, 'pedidos')) {
+            return false;
+        }
+
+        return true;
     }
 
     private function date(mixed $value): ?string

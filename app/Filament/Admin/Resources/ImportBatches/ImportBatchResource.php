@@ -5,12 +5,15 @@ namespace App\Filament\Admin\Resources\ImportBatches;
 use App\Filament\Admin\Resources\ImportBatches\Pages\CreateImportBatch;
 use App\Filament\Admin\Resources\ImportBatches\Pages\ListImportBatches;
 use App\Models\ImportBatch;
+use App\Services\Kdp\KdpReportImportService;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Throwable;
 
 class ImportBatchResource extends Resource
 {
@@ -97,6 +100,30 @@ class ImportBatchResource extends Resource
                 Tables\Columns\TextColumn::make('skipped_rows')->label('Duplicadas')->numeric(),
                 Tables\Columns\TextColumn::make('error_rows')->label('Errores')->numeric()->color('danger'),
                 Tables\Columns\TextColumn::make('created_at')->label('Fecha de carga')->dateTime('d/m/Y H:i')->sortable(),
+            ])
+            ->actions([
+                Tables\Actions\Action::make('reprocess')
+                    ->label('Reprocesar')
+                    ->icon('heroicon-o-arrow-path')
+                    ->requiresConfirmation()
+                    ->modalDescription('Se reconstruirán las filas derivadas desde el archivo original conservado.')
+                    ->action(function (ImportBatch $record): void {
+                        try {
+                            $batch = app(KdpReportImportService::class)->reprocess($record);
+                            Notification::make()
+                                ->success()
+                                ->title('Informe reprocesado')
+                                ->body("{$batch->imported_rows} filas importadas y {$batch->error_rows} errores.")
+                                ->send();
+                        } catch (Throwable $exception) {
+                            report($exception);
+                            Notification::make()
+                                ->danger()
+                                ->title('No se pudo reprocesar')
+                                ->body($exception->getMessage())
+                                ->send();
+                        }
+                    }),
             ])
             ->emptyStateHeading('Todavía no hay informes KDP')
             ->emptyStateDescription('Carga un CSV o XLSX descargado de Amazon KDP para llenar las tablas de análisis.');

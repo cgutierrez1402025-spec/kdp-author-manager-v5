@@ -1,6 +1,6 @@
 # KDP Author Manager v5
 
-La versión 5 incorpora importación auditable de los informes CSV/XLSX descargados desde Amazon KDP. En el panel de administración, la opción **Publicaciones → Importar informes KDP** permite cargar regalías, ventas, pedidos, KENP, pagos e históricos.
+La versión 5 incorpora importación auditable de los informes CSV/XLSX descargados desde Amazon KDP. En el panel de administración, la opción **Publicaciones → Importar informes KDP** permite cargar regalías, ventas, pedidos, KENP, pagos e históricos. El panel muestra unidades, regalías por moneda, KENP, títulos, marketplaces y evolución diaria directamente desde los datos normalizados.
 
 Cada archivo se conserva en almacenamiento privado, se registra como lote y sus filas se normalizan en `kdp_report_rows`, manteniendo también los valores originales. Las reimportaciones se detectan mediante huellas SHA-256 y las filas se vinculan con publicaciones propias por ASIN y formato cuando existe una coincidencia inequívoca.
 
