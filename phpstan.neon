@@ -1,0 +1,14 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    paths:
+        # Expand this list in later phases as legacy Filament/resources gain types.
+        - app/Policies
+        - app/Services
+    # Initial enforceable level. Raise one level per phase as legacy types are fixed.
+    level: 1
+    tmpDir: storage/framework/cache/phpstan
+    checkModelProperties: false
+    universalObjectCratesClasses:
+        - Illuminate\Database\Eloquent\Model

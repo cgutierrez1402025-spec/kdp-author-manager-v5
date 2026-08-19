@@ -1,0 +1,282 @@
+<?php
+
+namespace App\Services\Kdp;
+
+use App\Models\ImportBatch;
+use App\Models\ImportError;
+use App\Models\KdpReportRow;
+use App\Models\Publication;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use RuntimeException;
+use Throwable;
+
+class KdpReportImportService
+{
+    private const ALIASES = [
+        'title' => ['title', 'titulo'],
+        'author' => ['author', 'autor'],
+        'asin' => ['asin'],
+        'format' => ['format', 'formato'],
+        'marketplace' => ['marketplace', 'mercado'],
+        'currency' => ['currency', 'moneda'],
+        'transaction_type' => ['transaction type', 'tipo de transaccion'],
+        'royalty_type' => ['royalty type', 'tipo de regalia'],
+        'units_sold' => ['units sold', 'unidades vendidas'],
+        'units_refunded' => ['units refunded', 'unidades reembolsadas', 'devoluciones'],
+        'net_units_sold' => ['net units sold', 'unidades netas vendidas', 'unidades netas'],
+        'kenp_read' => ['kenp read', 'kenp pages read', 'paginas kenp leidas'],
+        'average_list_price' => ['average list price without tax', 'precio medio de lista sin impuestos'],
+        'average_offer_price' => ['average offer price without tax', 'precio medio de oferta sin impuestos'],
+        'average_delivery_cost' => ['average delivery cost', 'coste medio de entrega'],
+        'total_earnings' => ['total earnings', 'regalias', 'royalty', 'ganancias totales', 'ingresos totales'],
+        'payment_number' => ['payment number', 'numero de pago'],
+        'payment_status' => ['payment status', 'estado del pago'],
+        'payment_date' => ['payment date', 'fecha de pago'],
+        'accrued_royalty' => ['accrued royalty', 'regalia acumulada', 'regalias acumuladas'],
+        'tax_withholding' => ['tax withholding', 'retencion fiscal', 'retencion de impuestos'],
+        'fx_rate' => ['fx rate', 'tipo de cambio'],
+        'payment_amount' => ['payment amount', 'importe del pago'],
+    ];
+
+    public function import(ImportBatch $batch): ImportBatch
+    {
+        abort_unless($batch->user_id === auth()->id() || auth()->user()?->canViewAllAuthorData(), 403);
+
+        $batch->update(['status' => 'processing', 'started_at' => now()]);
+
+        try {
+            $tables = $this->readTables(Storage::disk('local')->path($batch->original_file_path));
+            $counters = ['total_rows' => 0, 'imported_rows' => 0, 'skipped_rows' => 0, 'error_rows' => 0];
+
+            DB::transaction(function () use ($batch, $tables, &$counters): void {
+                foreach ($tables as $sheet => $rows) {
+                    $this->importTable($batch, $sheet, $rows, $counters);
+                }
+            });
+
+            $batch->update($counters + ['status' => 'completed', 'finished_at' => now()]);
+        } catch (Throwable $exception) {
+            $batch->update(['status' => 'failed', 'finished_at' => now(), 'notes' => $exception->getMessage()]);
+            throw $exception;
+        }
+
+        return $batch->refresh();
+    }
+
+    /** @return array<string, array<int, array<int, string|null>>> */
+    private function readTables(string $path): array
+    {
+        $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+        if ($extension === 'xlsx') {
+            return app(XlsxTableReader::class)->read($path);
+        }
+        if (! in_array($extension, ['csv', 'txt'], true)) {
+            throw new RuntimeException('Formato no admitido. Utiliza CSV o XLSX.');
+        }
+
+        $firstLine = (string) fgets(fopen($path, 'rb'));
+        $delimiter = collect([',', ';', "\t"])->sortByDesc(fn (string $candidate) => substr_count($firstLine, $candidate))->first();
+        $file = new \SplFileObject($path, 'rb');
+        $file->setCsvControl($delimiter);
+        $file->setFlags(\SplFileObject::READ_CSV | \SplFileObject::SKIP_EMPTY | \SplFileObject::DROP_NEW_LINE);
+        $rows = [];
+        foreach ($file as $row) {
+            if (is_array($row) && $row !== [null]) {
+                $rows[] = array_map(fn ($value) => is_string($value) ? mb_convert_encoding($value, 'UTF-8', 'UTF-8, Windows-1252') : $value, $row);
+            }
+        }
+
+        return ['CSV' => $rows];
+    }
+
+    /** @param array<int, array<int, string|null>> $rows
+     * @param  array<string, int>  $counters
+     */
+    private function importTable(ImportBatch $batch, string $sheet, array $rows, array &$counters): void
+    {
+        $headerIndex = $this->headerIndex($rows);
+        if ($headerIndex === null) {
+            return;
+        }
+
+        $headers = array_map(fn ($header) => $this->normalizeHeader((string) $header), $rows[$headerIndex]);
+
+        foreach (array_slice($rows, $headerIndex + 1, null, true) as $index => $values) {
+            if (count(array_filter($values, fn ($value) => trim((string) $value) !== '')) === 0) {
+                continue;
+            }
+
+            $counters['total_rows']++;
+            $raw = [];
+            foreach ($headers as $column => $header) {
+                if ($header !== '') {
+                    $raw[$header] = $values[$column] ?? null;
+                }
+            }
+
+            try {
+                $normalized = $this->normalizeRow($raw);
+                $fingerprint = hash('sha256', implode('|', [
+                    $batch->user_id,
+                    $batch->import_type,
+                    optional($batch->report_period)->format('Y-m'),
+                    json_encode($normalized, JSON_UNESCAPED_UNICODE | JSON_PRESERVE_ZERO_FRACTION),
+                ]));
+
+                if (KdpReportRow::where('user_id', $batch->user_id)->where('row_fingerprint', $fingerprint)->exists()) {
+                    $counters['skipped_rows']++;
+
+                    continue;
+                }
+
+                KdpReportRow::create($normalized + [
+                    'user_id' => $batch->user_id,
+                    'import_batch_id' => $batch->id,
+                    'publication_id' => $this->publicationId($batch, $normalized),
+                    'row_fingerprint' => $fingerprint,
+                    'report_type' => $batch->import_type,
+                    'report_period' => $batch->report_period,
+                    'raw_data' => ['sheet' => $sheet, 'row' => $index + 1, 'values' => $raw],
+                    'normalized_data' => $normalized,
+                ]);
+                $counters['imported_rows']++;
+            } catch (Throwable $exception) {
+                ImportError::create([
+                    'import_batch_id' => $batch->id,
+                    'severity' => 'error',
+                    'error_type' => 'invalid_row',
+                    'message' => $exception->getMessage(),
+                    'row_number' => $index + 1,
+                    'suggested_solution' => 'Revise la fila en el archivo original y vuelva a importarlo.',
+                    'resolved' => false,
+                ]);
+                $counters['error_rows']++;
+            }
+        }
+    }
+
+    /** @param array<int, array<int, string|null>> $rows */
+    private function headerIndex(array $rows): ?int
+    {
+        $known = collect(self::ALIASES)->flatten()->map(fn ($header) => $this->normalizeHeader($header));
+        $bestIndex = null;
+        $bestScore = 0;
+
+        foreach (array_slice($rows, 0, 25, true) as $index => $row) {
+            $score = collect($row)->map(fn ($value) => $this->normalizeHeader((string) $value))->intersect($known)->count();
+            if ($score > $bestScore) {
+                $bestIndex = $index;
+                $bestScore = $score;
+            }
+        }
+
+        return $bestScore >= 2 ? $bestIndex : null;
+    }
+
+    /** @param array<string, mixed> $raw
+     * @return array<string, mixed>
+     */
+    private function normalizeRow(array $raw): array
+    {
+        $row = [];
+        foreach (self::ALIASES as $field => $aliases) {
+            foreach ($aliases as $alias) {
+                $key = $this->normalizeHeader($alias);
+                if (array_key_exists($key, $raw)) {
+                    $row[$field] = is_string($raw[$key]) ? trim($raw[$key]) : $raw[$key];
+                    break;
+                }
+            }
+        }
+
+        if (empty($row['asin']) && empty($row['payment_number'])) {
+            throw new RuntimeException('La fila no contiene ASIN ni número de pago.');
+        }
+
+        foreach (['units_sold', 'units_refunded', 'net_units_sold', 'kenp_read'] as $field) {
+            $row[$field] = $this->number($row[$field] ?? null, true);
+        }
+        foreach (['average_list_price', 'average_offer_price', 'average_delivery_cost', 'total_earnings', 'accrued_royalty', 'tax_withholding', 'fx_rate', 'payment_amount'] as $field) {
+            $row[$field] = $this->number($row[$field] ?? null);
+        }
+
+        $row['asin'] = isset($row['asin']) ? strtoupper($row['asin']) : null;
+        $row['currency'] = isset($row['currency']) ? strtoupper(substr($row['currency'], 0, 3)) : null;
+        $row['format'] = $this->format($row['format'] ?? $row['royalty_type'] ?? null);
+        $row['payment_date'] = $this->date($row['payment_date'] ?? null);
+
+        return $row;
+    }
+
+    /** @param array<string, mixed> $row */
+    private function publicationId(ImportBatch $batch, array $row): ?int
+    {
+        if (empty($row['asin'])) {
+            return null;
+        }
+
+        return Publication::query()
+            ->where('asin', $row['asin'])
+            ->when($row['format'] ?? null, fn ($query, $format) => $query->where('format', $format))
+            ->whereHas('work', fn ($query) => $query->where('user_id', $batch->user_id))
+            ->value('id');
+    }
+
+    private function normalizeHeader(string $header): string
+    {
+        return (string) Str::of($header)->lower()->ascii()->replaceMatches('/\s+/', ' ')->trim();
+    }
+
+    private function number(mixed $value, bool $integer = false): int|float|null
+    {
+        if ($value === null || trim((string) $value) === '' || strtoupper(trim((string) $value)) === 'N/A') {
+            return null;
+        }
+
+        $value = preg_replace('/[^0-9,\.\-]/', '', (string) $value);
+        if (str_contains($value, ',') && str_contains($value, '.')) {
+            $value = strrpos($value, ',') > strrpos($value, '.')
+                ? str_replace(['.', ','], ['', '.'], $value)
+                : str_replace(',', '', $value);
+        } elseif (str_contains($value, ',')) {
+            $value = str_replace(',', '.', $value);
+        }
+
+        if (! is_numeric($value)) {
+            throw new RuntimeException("Valor numérico no válido: {$value}");
+        }
+
+        return $integer ? (int) round((float) $value) : (float) $value;
+    }
+
+    private function format(?string $value): ?string
+    {
+        $value = $this->normalizeHeader((string) $value);
+
+        return match (true) {
+            str_contains($value, 'paperback'), str_contains($value, 'tapa blanda') => 'paperback',
+            str_contains($value, 'hardcover'), str_contains($value, 'tapa dura') => 'hardcover',
+            str_contains($value, 'ebook'), str_contains($value, 'kindle') => 'ebook',
+            default => $value !== '' ? $value : null,
+        };
+    }
+
+    private function date(mixed $value): ?string
+    {
+        if ($value === null || trim((string) $value) === '') {
+            return null;
+        }
+        if (is_numeric($value)) {
+            return Carbon::create(1899, 12, 30)->addDays((int) $value)->toDateString();
+        }
+
+        try {
+            return Carbon::parse((string) $value)->toDateString();
+        } catch (Throwable) {
+            throw new RuntimeException("Fecha no válida: {$value}");
+        }
+    }
+}

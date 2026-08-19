@@ -1,0 +1,16 @@
+node_modules/
+vendor/
+.git/
+.env
+storage/
+bootstrap/cache/
+.DS_Store
+*.log
+dist/
+build/
+public/build/
+.venv/
+__pycache__/
+.pytest_cache/
+.env.local
+.env.*.local

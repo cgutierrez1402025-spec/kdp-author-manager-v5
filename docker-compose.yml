@@ -1,0 +1,35 @@
+services:
+  laravel:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: laravel-app
+    entrypoint: /entrypoint.sh
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - APP_KEY=base64:p68+25OKYkMrhR6Bq/MXBJk55c8DhA77BvT9fj+P0cg=
+      - DB_CONNECTION=sqlite
+      - QUEUE_CONNECTION=database
+      - CACHE_STORE=database
+      - SESSION_DRIVER=database
+    volumes:
+      - ./storage:/app/storage
+      - ./bootstrap/cache:/app/bootstrap/cache
+      - ./database:/app/database
+    restart: unless-stopped
+    networks:
+      - laravel
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  laravel:
+    driver: bridge
+

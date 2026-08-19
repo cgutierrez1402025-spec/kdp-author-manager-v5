@@ -1,0 +1,155 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@config 'tailwind.config.js';
+
+:root {
+    --editorial-ink: 30 41 59;
+    --editorial-paper: 248 250 252;
+}
+
+html {
+    min-height: 100%;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    scroll-behavior: smooth;
+    scroll-padding-bottom: 3rem;
+}
+
+.fi-body {
+    min-height: 100dvh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background:
+        radial-gradient(circle at top right, rgb(245 158 11 / 0.08), transparent 28rem),
+        rgb(var(--editorial-paper));
+}
+
+.fi-layout {
+    min-height: 100dvh;
+    height: auto;
+    overflow-y: visible;
+}
+
+.fi-main-ctn {
+    min-height: 100dvh;
+    height: auto;
+    overflow: visible;
+}
+
+.dark .fi-body {
+    background:
+        radial-gradient(circle at top right, rgb(245 158 11 / 0.08), transparent 28rem),
+        rgb(3 7 18);
+}
+
+.fi-sidebar-header,
+.fi-topbar nav {
+    @apply border-b border-gray-200/80 bg-white/90 shadow-none backdrop-blur-xl dark:border-white/10 dark:bg-gray-950/90;
+}
+
+.fi-sidebar-nav {
+    @apply bg-white dark:bg-gray-950;
+}
+
+.fi-sidebar-group-label {
+    @apply text-[0.68rem] font-bold uppercase tracking-[0.12em] text-gray-400;
+}
+
+.fi-sidebar-item-active > a {
+    @apply ring-1 ring-primary-200 dark:ring-primary-500/30;
+}
+
+.fi-header-heading {
+    @apply tracking-tight text-gray-950 dark:text-white;
+}
+
+.fi-main {
+    min-height: calc(100dvh - 4rem);
+    height: auto;
+    overflow: visible;
+    @apply pb-20;
+}
+
+.fi-page-header-main-ctn {
+    @apply gap-5;
+}
+
+.fi-wi {
+    grid-template-columns: minmax(0, 1fr) !important;
+    width: 100%;
+    max-width: 100%;
+    @apply min-w-0;
+}
+
+.fi-wi-widget {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.fi-wi-widget :where(h2, h3, h4, p, span, a) {
+    overflow-wrap: anywhere;
+}
+
+.fi-section,
+.fi-ta-ctn,
+.editorial-card {
+    @apply rounded-2xl border border-gray-200/80 bg-white shadow-sm shadow-gray-950/5 dark:border-white/10 dark:bg-gray-900;
+}
+
+.fi-section-header {
+    @apply border-b border-gray-100 dark:border-white/5;
+}
+
+.fi-section-content-ctn {
+    @apply min-w-0;
+}
+
+.fi-btn {
+    @apply rounded-xl;
+}
+
+.fi-input-wrp {
+    @apply rounded-xl shadow-sm;
+}
+
+.editorial-empty {
+    @apply flex min-h-28 flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 px-6 py-8 text-center dark:border-gray-700;
+}
+
+.editorial-kicker {
+    @apply text-xs font-semibold uppercase tracking-[0.12em] text-primary-600 dark:text-primary-400;
+}
+
+.editorial-muted {
+    @apply text-sm text-gray-500 dark:text-gray-400;
+}
+
+@media (max-width: 640px) {
+    html {
+        scroll-padding-top: 4rem;
+    }
+
+    .fi-main {
+        @apply px-3 pb-24;
+    }
+
+    .fi-header-actions {
+        @apply w-full;
+    }
+
+    .fi-header-actions .fi-ac {
+        @apply grid w-full grid-cols-1;
+    }
+
+    .fi-header-actions .fi-btn {
+        @apply w-full justify-center;
+    }
+}
+
+@media (min-width: 1024px) {
+    .fi-dashboard-page .fi-wi {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+}
