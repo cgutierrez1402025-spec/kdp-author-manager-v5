@@ -1,5 +1,7 @@
 # Plan de implementación del módulo de audiolibros
 
+> Estado a 19/08/2026: el núcleo transversal de las fases 1–5 está implementado y probado. Incluye edición, narradores, producción, capítulos, activos versionados, pronunciaciones, QA, distribución, costes y regalías. Las audiciones/ofertas avanzadas y los importadores ACX/KDP de audio permanecen condicionados a disponer de muestras reales y se mantienen como ampliación; véase `RESULTADO_IMPLEMENTACION_AUDIOLIBROS.md`.
+
 ## Fase 0 — decisiones y muestras (1 semana)
 
 - confirmar países/cuentas disponibles y derechos de audio;
@@ -75,4 +77,3 @@ Salida: rendimiento y liquidaciones auditables.
 ## MVP recomendado
 
 Fases 0–3: inventario de audiolibros, método, narradores/contrato y control de producción. Distribución e ingresos pueden añadirse después sin rediseñar el núcleo.
-

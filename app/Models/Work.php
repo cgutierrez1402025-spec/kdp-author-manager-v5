@@ -45,6 +45,11 @@ class Work extends Model
         return $this->hasMany(Publication::class);
     }
 
+    public function audiobookEditions(): HasMany
+    {
+        return $this->hasMany(AudiobookEdition::class);
+    }
+
     public function series(): BelongsTo
     {
         return $this->belongsTo(Series::class);

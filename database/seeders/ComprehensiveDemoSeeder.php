@@ -87,6 +87,49 @@ class ComprehensiveDemoSeeder extends Seeder
                 'received_date' => '2026-03-29', 'status' => 'received', 'notes' => 'Pago demo conciliado.',
             ]);
 
+            $narrator = $this->record('narrators', ['user_id' => $author, 'name' => 'Lucía Voz Demo'], [
+                'stage_name' => 'Lucía Horizonte', 'narrator_type' => 'human', 'languages' => json_encode(['es']),
+                'contact_email' => 'narracion@example.com', 'voice_consent' => true, 'consent_expires_at' => '2028-12-31',
+                'notes' => 'Perfil ficticio para explorar el módulo de audiolibros.',
+            ]);
+            $audiobook = $this->record('audiobook_editions', ['user_id' => $author, 'work_id' => $work->id, 'language_code' => 'es'], [
+                'work_language_id' => $language->id, 'manuscript_version_id' => $manuscript->id, 'source_publication_id' => $publication->id,
+                'title' => $work->title_public.' — Audiolibro', 'production_method' => 'human', 'status' => 'quality_review',
+                'rights_status' => 'confirmed', 'exclusive' => false, 'territories' => json_encode(['ES', 'US']),
+                'estimated_duration_minutes' => 310, 'final_duration_minutes' => 304, 'list_price' => 14.99, 'currency' => 'EUR',
+            ]);
+            $this->record('audiobook_narrators', ['audiobook_edition_id' => $audiobook, 'narrator_id' => $narrator, 'role' => 'narrator'], ['sort_order' => 1]);
+            $this->record('audiobook_productions', ['audiobook_edition_id' => $audiobook, 'narrator_id' => $narrator], [
+                'provider' => 'Producción directa', 'contract_type' => 'per_finished_hour', 'status' => 'approved',
+                'per_finished_hour_rate' => 180, 'estimated_cost' => 930, 'actual_cost' => 912, 'currency' => 'EUR', 'approved_at' => '2026-08-15',
+            ]);
+            $audioChapter = $this->record('audiobook_chapters', ['audiobook_edition_id' => $audiobook, 'chapter_order' => 1], [
+                'chapter_id' => $chapter?->id, 'narrator_id' => $narrator, 'title' => $chapter?->title ?? 'Capítulo 1',
+                'word_count' => 4200, 'final_duration_seconds' => 1680, 'status' => 'approved',
+            ]);
+            $audioAsset = $this->record('audio_assets', ['audiobook_edition_id' => $audiobook, 'asset_type' => 'chapter', 'audiobook_chapter_id' => $audioChapter, 'version' => 1], [
+                'file_path' => 'private/demo/audiobooks/capitulo-01.mp3', 'file_hash' => hash('sha256', 'demo-audio-chapter-1'),
+                'duration_seconds' => 1680, 'codec' => 'mp3', 'bitrate_kbps' => 192, 'sample_rate_hz' => 44100,
+                'channels' => 'mono', 'rms_db' => -20.4, 'peak_db' => -3.2, 'noise_floor_db' => -62.0, 'qa_status' => 'passed', 'uploaded_by' => $author,
+            ]);
+            $this->record('audiobook_pronunciations', ['audiobook_edition_id' => $audiobook, 'term' => 'Horizonte'], [
+                'audiobook_chapter_id' => $audioChapter, 'pronunciation' => 'o-ri-SON-te', 'language_code' => 'es', 'status' => 'approved',
+            ]);
+            $this->record('audiobook_distributions', ['audiobook_edition_id' => $audiobook, 'distributor' => 'Audible', 'channel' => 'Amazon'], [
+                'marketplace' => 'amazon.com', 'exclusive' => false, 'territories' => json_encode(['US']), 'list_price' => 14.99,
+                'currency' => 'USD', 'status' => 'submitted',
+            ]);
+            $this->record('audiobook_costs', ['audiobook_edition_id' => $audiobook, 'cost_type' => 'narration', 'incurred_at' => '2026-08-15'], [
+                'amount' => 912, 'currency' => 'EUR', 'description' => 'Narración y edición de audio demo.',
+            ]);
+            $this->record('audiobook_royalties', ['audiobook_edition_id' => $audiobook, 'distributor' => 'Audible', 'marketplace' => 'amazon.com', 'period_start' => '2026-07-01', 'period_end' => '2026-07-31'], [
+                'units' => 18, 'net_revenue' => 150.30, 'royalty_amount' => 60.12, 'currency' => 'USD', 'source_reference' => 'DEMO-AUDIO-2026-07',
+            ]);
+            $this->record('audiobook_quality_checks', ['audiobook_edition_id' => $audiobook, 'audio_asset_id' => $audioAsset, 'check_type' => 'technical'], [
+                'rule_version' => 'audible-2026', 'status' => 'passed', 'evidence' => json_encode(['peak_db' => -3.2, 'noise_floor_db' => -62.0]),
+                'reviewed_by' => $author, 'checked_at' => now(),
+            ]);
+
             $award = $this->record('awards', ['name' => 'Premio Narrativa Horizonte 2026'], [
                 'organizer' => 'Fundación Letras Abiertas', 'country' => 'España', 'city' => 'Madrid', 'genre' => 'Narrativa',
                 'language_code' => 'es', 'prize_amount' => '3.000 EUR', 'url' => 'https://example.com/premio-demo',

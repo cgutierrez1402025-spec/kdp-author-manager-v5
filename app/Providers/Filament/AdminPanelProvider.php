@@ -4,6 +4,7 @@ namespace App\Providers\Filament;
 
 use App\Filament\Admin\Pages\Dashboard;
 use App\Filament\Admin\Resources\AiTasks\AiTaskResource;
+use App\Filament\Admin\Resources\AudiobookEditions\AudiobookEditionResource;
 use App\Filament\Admin\Resources\BookEvents\BookEventResource;
 use App\Filament\Admin\Resources\BookPromotions\BookPromotionResource;
 use App\Filament\Admin\Resources\Checklists\ChecklistResource;
@@ -15,6 +16,7 @@ use App\Filament\Admin\Resources\KdpMetadatas\KdpMetadataResource;
 use App\Filament\Admin\Resources\KdpSelectPeriods\KdpSelectPeriodResource;
 use App\Filament\Admin\Resources\ManuscriptVersions\ManuscriptVersionResource;
 use App\Filament\Admin\Resources\Marketplaces\MarketplaceResource;
+use App\Filament\Admin\Resources\Narrators\NarratorResource;
 use App\Filament\Admin\Resources\Platforms\PlatformResource;
 use App\Filament\Admin\Resources\PromotionCosts\PromotionCostResource;
 use App\Filament\Admin\Resources\PromotionDailyResults\PromotionDailyResultResource;
@@ -78,6 +80,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->resources([
                 AiTaskResource::class,
+                AudiobookEditionResource::class,
                 BookEventResource::class,
                 BookPromotionResource::class,
                 ChecklistResource::class,
@@ -89,6 +92,7 @@ class AdminPanelProvider extends PanelProvider
                 KdpSelectPeriodResource::class,
                 ManuscriptVersionResource::class,
                 MarketplaceResource::class,
+                NarratorResource::class,
                 PlatformResource::class,
                 PromotionCostResource::class,
                 PromotionDailyResultResource::class,

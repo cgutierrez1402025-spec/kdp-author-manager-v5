@@ -14,6 +14,7 @@
 - [`INFORME_INTEGRACION_AUDIOLIBROS.md`](INFORME_INTEGRACION_AUDIOLIBROS.md): opciones KDP/ACX y cambios completos del dominio.
 - [`ENUNCIADO_ESTUDIANTES_MODULO_AUDIOLIBROS.md`](ENUNCIADO_ESTUDIANTES_MODULO_AUDIOLIBROS.md): proyecto evaluable para diseñar e implementar el módulo.
 - [`PLAN_IMPLEMENTACION_AUDIOLIBROS.md`](PLAN_IMPLEMENTACION_AUDIOLIBROS.md): fases, dependencias y puertas de calidad.
+- [`RESULTADO_IMPLEMENTACION_AUDIOLIBROS.md`](RESULTADO_IMPLEMENTACION_AUDIOLIBROS.md): alcance ejecutado, esquema, reglas y comprobaciones de la versión.
 - [`TEST_PLAN_AND_RESULTS.md`](TEST_PLAN_AND_RESULTS.md): cobertura y último resultado verificado.
 - [`FORM_RELATIONSHIP_AUDIT.md`](FORM_RELATIONSHIP_AUDIT.md): asociaciones entre entidades y formularios Filament.
 - [`ERROR_REVIEW_PLAN.md`](ERROR_REVIEW_PLAN.md): estrategia de revisión y regresión.

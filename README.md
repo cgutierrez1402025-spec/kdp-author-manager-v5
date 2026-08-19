@@ -6,6 +6,8 @@ Cada archivo se conserva en almacenamiento privado, se registra como lote y sus 
 
 Los títulos ausentes se registran automáticamente en `kdp_catalog_items` y aparecen en **Catálogo detectado KDP**. Permanecen pendientes hasta que el autor los vincule o complete los datos editoriales que los informes de Amazon no proporcionan.
 
+La versión incluye además el núcleo operativo de audiolibros en **Publicaciones → Audiolibros** y **Narradores y voces**. Permite relacionar cada edición de audio con su obra, idioma y manuscrito; registrar producción humana, voz virtual, réplica de voz o modelos híbridos; y conservar capítulos, activos versionados, pronunciaciones, controles de calidad, distribución, costes y regalías. El servicio de flujo impide publicar sin derechos confirmados, capítulos y activos aprobados o, en una réplica, consentimiento vigente.
+
 Aplicación web para gestionar el ciclo editorial de obras publicadas mediante Amazon KDP: manuscritos, publicaciones, metadatos, regalías, promociones, eventos, fuentes, ilustraciones y tareas asistidas por IA.
 
 El panel de administración está construido con Laravel 12, Filament 3, Livewire 3, SQLite/MySQL y Vite.
