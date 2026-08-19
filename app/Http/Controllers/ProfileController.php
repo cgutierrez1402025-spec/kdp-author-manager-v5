@@ -26,7 +26,14 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
+        $wasOptedIn = $request->user()->analytics_opt_in;
         $request->user()->fill($request->validated());
+
+        if (! $wasOptedIn && $request->user()->analytics_opt_in) {
+            $request->user()->analytics_consented_at = now();
+        } elseif ($wasOptedIn && ! $request->user()->analytics_opt_in) {
+            $request->user()->analytics_consented_at = null;
+        }
 
         if ($request->user()->isDirty('email')) {
             $request->user()->email_verified_at = null;

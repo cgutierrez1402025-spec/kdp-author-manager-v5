@@ -24,6 +24,18 @@
         </div>
 
         <div>
+            <input type="hidden" name="analytics_opt_in" value="0">
+            <label for="analytics_opt_in" class="flex items-start gap-3">
+                <input id="analytics_opt_in" name="analytics_opt_in" type="checkbox" value="1" class="mt-1 rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" @checked(old('analytics_opt_in', $user->analytics_opt_in))>
+                <span>
+                    <span class="block text-sm font-medium text-gray-900">Participar en analítica agregada</span>
+                    <span class="block text-sm text-gray-600">Autoriza a utilizar métricas editoriales y comerciales de forma agregada para comparativas. No publica tu identidad, manuscritos ni archivos privados y puedes retirar el consentimiento.</span>
+                </span>
+            </label>
+            <x-input-error class="mt-2" :messages="$errors->get('analytics_opt_in')" />
+        </div>
+
+        <div>
             <x-input-label for="email" :value="__('Email')" />
             <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email', $user->email)" required autocomplete="username" />
             <x-input-error class="mt-2" :messages="$errors->get('email')" />

@@ -8,6 +8,8 @@ Los títulos ausentes se registran automáticamente en `kdp_catalog_items` y apa
 
 La versión incluye además el núcleo operativo de audiolibros en **Publicaciones → Audiolibros** y **Narradores y voces**. Permite relacionar cada edición de audio con su obra, idioma y manuscrito; registrar producción humana, voz virtual, réplica de voz o modelos híbridos; y conservar capítulos, activos versionados, pronunciaciones, controles de calidad, distribución, costes y regalías. El servicio de flujo impide publicar sin derechos confirmados, capítulos y activos aprobados o, en una réplica, consentimiento vigente.
 
+Cada publicación dispone de históricos de precio y observaciones de mercado para analizar cambios sin sobrescribir el pasado. El perfil permite aceptar o retirar de forma explícita la participación en analítica agregada. El diagnóstico operativo puede ejecutarse con `php artisan app:health`.
+
 Aplicación web para gestionar el ciclo editorial de obras publicadas mediante Amazon KDP: manuscritos, publicaciones, metadatos, regalías, promociones, eventos, fuentes, ilustraciones y tareas asistidas por IA.
 
 El panel de administración está construido con Laravel 12, Filament 3, Livewire 3, SQLite/MySQL y Vite.

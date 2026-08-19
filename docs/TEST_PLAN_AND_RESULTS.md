@@ -17,6 +17,7 @@ Fecha: 19 de agosto de 2026
 11. Sintaxis PHP, validez de Composer y compilación Vite de producción.
 12. Audiolibros: trazabilidad de obra a regalía, acceso Filament, transición a publicación, QA y consentimiento de réplica de voz.
 13. Importación múltiple KDP: detección de tipo/periodo, varios informes, ZIP seguro, duplicados, aislamiento de fallos y autorización.
+14. Inteligencia de decisión: histórico temporal de precios, métricas de mercado, solapamientos, consentimiento analítico y diagnóstico operativo.
 
 ## Errores corregidos
 
@@ -31,8 +32,8 @@ Fecha: 19 de agosto de 2026
 
 ## Resultado final
 
-- 74 pruebas superadas.
-- 543 aserciones correctas.
+- 79 pruebas superadas.
+- 565 aserciones correctas.
 - 22 listados y 21 formularios de edición probados con datos sembrados.
 - 105 relaciones Eloquent resueltas correctamente.
 - Migración limpia y seeders correctos.

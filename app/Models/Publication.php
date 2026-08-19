@@ -63,6 +63,16 @@ class Publication extends Model
         return $this->hasMany(RoyaltyEntry::class);
     }
 
+    public function priceHistories(): HasMany
+    {
+        return $this->hasMany(PublicationPriceHistory::class);
+    }
+
+    public function marketObservations(): HasMany
+    {
+        return $this->hasMany(PublicationMarketObservation::class);
+    }
+
     public function kdpMetadata(): HasOne
     {
         return $this->hasOne(KdpMetadata::class);

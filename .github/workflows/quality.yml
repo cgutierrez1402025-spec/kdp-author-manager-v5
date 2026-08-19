@@ -28,6 +28,13 @@ jobs:
       - run: composer format:check
       - run: composer analyse
       - run: composer test
+      - name: Verify deployable database and health check
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+          touch database/database.sqlite
+          php artisan migrate --seed --force
+          php artisan app:health
 
   frontend:
     runs-on: ubuntu-latest
@@ -39,4 +46,5 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - run: npm audit --audit-level=high
       - run: npm run build

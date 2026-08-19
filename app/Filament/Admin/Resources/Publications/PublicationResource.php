@@ -57,6 +57,8 @@ class PublicationResource extends Resource
     {
         return [
             RelationManagers\KdpMetadataRelationManager::class,
+            RelationManagers\PriceHistoriesRelationManager::class,
+            RelationManagers\MarketObservationsRelationManager::class,
         ];
     }
 

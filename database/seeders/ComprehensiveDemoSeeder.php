@@ -21,6 +21,7 @@ class ComprehensiveDemoSeeder extends Seeder
             $publication = DB::table('publications')->where('work_id', $work->id)->first();
             $platform = DB::table('platforms')->where('name', 'Amazon KDP')->first();
             $marketplace = DB::table('marketplaces')->where('platform_id', $platform->id)->where('code', 'amazon.es')->first();
+            DB::table('users')->where('id', $author)->update(['analytics_opt_in' => true, 'analytics_consented_at' => $now]);
 
             foreach ([['es', 'Español'], ['en', 'Inglés'], ['fr', 'Francés'], ['de', 'Alemán']] as [$code, $name]) {
                 $this->record('languages', ['code' => $code], ['name' => $name, 'native_name' => $name, 'active' => true]);
@@ -85,6 +86,16 @@ class ComprehensiveDemoSeeder extends Seeder
                 'marketplace_id' => $marketplace->id, 'period_end' => '2026-01-31', 'expected_amount' => 245.80,
                 'received_amount' => 245.80, 'withheld_tax' => 0, 'currency' => 'EUR', 'expected_date' => '2026-03-31',
                 'received_date' => '2026-03-29', 'status' => 'received', 'notes' => 'Pago demo conciliado.',
+            ]);
+            $this->record('publication_price_histories', ['publication_id' => $publication->id, 'marketplace_id' => $marketplace->id, 'starts_at' => '2026-01-01'], [
+                'price' => 4.99, 'currency' => 'EUR', 'ends_at' => '2026-05-31', 'change_reason' => 'launch',
+            ]);
+            $this->record('publication_price_histories', ['publication_id' => $publication->id, 'marketplace_id' => $marketplace->id, 'starts_at' => '2026-06-01'], [
+                'price' => 5.99, 'currency' => 'EUR', 'change_reason' => 'regular_adjustment',
+            ]);
+            $this->record('publication_market_observations', ['publication_id' => $publication->id, 'marketplace_id' => $marketplace->id, 'observed_at' => '2026-08-01'], [
+                'average_rating' => 4.35, 'rating_count' => 86, 'review_count' => 31, 'overall_rank' => 12450,
+                'category_name' => 'Ficción histórica', 'category_rank' => 47, 'source' => 'Dato demo manual',
             ]);
 
             $narrator = $this->record('narrators', ['user_id' => $author, 'name' => 'Lucía Voz Demo'], [
