@@ -60,9 +60,19 @@ El importe y la moneda originales se conservan. Los gráficos agrupan regalías 
 
 La asociación automática busca el ASIN entre las publicaciones del usuario y, cuando el informe permite inferirlo, el formato. Una fila puede ser válida aunque `publication_id` sea nulo. Esto sucede cuando el libro todavía no existe en el catálogo interno o el formato no coincide.
 
-Los títulos no vinculados aparecen en **Publicaciones → Catálogo detectado KDP** como pendientes. No se crea automáticamente una obra editorial porque el informe no aporta idioma original ni versión de manuscrito; el registro observado conserva todos los datos disponibles hasta que el autor complete la revisión.
+Los títulos no vinculados se materializan automáticamente en `works`, `publications` y `kdp_metadata`, además de aparecer en **Publicaciones → Catálogo detectado KDP**. La obra y la publicación usan el estado `catalog_review`; idioma, manuscrito, género y otros datos ausentes quedan en `NULL` hasta la revisión.
 
 Desde ese listado se puede usar **Crear obra y edición** para completar idioma, marketplace y formato, o **Vincular a obra**. La operación crea las relaciones necesarias de forma transaccional y nunca inventa un manuscrito. También puede marcarse un elemento como ignorado.
+
+La identidad automática de la obra combina usuario, título normalizado y autor. Por ello, ebook, tapa blanda y tapa dura con títulos/autores iguales se agrupan bajo una obra, mientras cada ASIN/formato/mercado conserva su publicación. Si ya existe una coincidencia inequívoca, se reutiliza. El proceso completo es idempotente.
+
+Para aplicar esta proyección a informes cargados antes de esta versión:
+
+```bash
+php artisan kdp:materialize-catalog
+```
+
+No se crean filas en `work_languages` ni `manuscript_versions` si el informe no contiene idioma o manuscrito. Tampoco se copian las regalías a `royalty_entries`, porque eso duplicaría la fuente: `kdp_report_rows` continúa siendo la tabla canónica para los informes importados.
 
 Procedimiento recomendado:
 

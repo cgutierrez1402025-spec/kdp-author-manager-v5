@@ -4,13 +4,19 @@ Fecha: 19 de agosto de 2026.
 
 ## Catálogo detectado
 
-Los informes siguen entrando primero en `kdp_report_rows` y `kdp_catalog_items`. En **Publicaciones → Catálogo detectado KDP**, un registro pendiente ofrece ahora:
+Los informes siguen entrando primero en `kdp_report_rows` y `kdp_catalog_items`. A continuación, la aplicación crea o reutiliza automáticamente la obra y sus ediciones provisionales en `works`, `publications` y `kdp_metadata`; también crea el marketplace KDP si todavía no existe. En **Publicaciones → Catálogo detectado KDP**, las acciones manuales quedan disponibles para corregir casos excepcionales:
 
 - **Crear obra y edición**: solicita título, autor, idioma, tipo de obra, marketplace y formato.
 - **Vincular a obra**: selecciona una obra y su idioma; el manuscrito final es opcional.
 - **Ignorar**: descarta el elemento sin borrar la fila original del informe.
 
-La creación se ejecuta en una transacción y añade registros en `works`, `work_languages`, `publications` y `kdp_metadata`. Después actualiza `kdp_catalog_items` y todas sus `kdp_report_rows` con las relaciones creadas.
+La materialización se ejecuta en una transacción y enlaza `kdp_catalog_items` y sus `kdp_report_rows`. No inventa filas en `work_languages`, manuscritos o regalías cuando el informe no contiene esos datos. La persona autora completa posteriormente idioma, clasificación y manuscrito desde los formularios habituales.
+
+Los informes ya importados se pueden materializar con:
+
+```bash
+php artisan kdp:materialize-catalog
+```
 
 Una publicación procedente del catálogo puede tener `manuscript_version_id = NULL` y estado `catalog_review`. Esto representa una edición comercial histórica cuyo archivo editorial todavía no se ha aportado; no se crea un manuscrito ficticio. El flujo normal de creación manual sigue exigiendo una versión final.
 
@@ -40,7 +46,7 @@ php artisan kdp:materialize-payments
 ## Seguridad e integridad
 
 - Un autor sólo puede promocionar sus propios elementos.
-- Título, autor, idioma, marketplace y formato son obligatorios al crear.
+- La creación manual exige título, autor, idioma, marketplace y formato; la importación automática admite campos desconocidos y los marca para revisión.
 - El marketplace debe pertenecer a Amazon KDP.
 - Si se indica manuscrito, debe ser final y pertenecer a la obra y el idioma.
 - Un ASIN ya asignado a otra obra bloquea la operación.

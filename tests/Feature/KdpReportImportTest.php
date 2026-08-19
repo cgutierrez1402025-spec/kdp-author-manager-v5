@@ -163,8 +163,10 @@ class KdpReportImportTest extends TestCase
 
         $item = KdpCatalogItem::firstOrFail();
         $this->assertSame('Obra desconocida', $item->title);
-        $this->assertSame('pending', $item->review_status);
-        $this->assertNull($item->work_id);
+        $this->assertSame('linked', $item->review_status);
+        $this->assertNotNull($item->work_id);
+        $this->assertDatabaseHas('works', ['id' => $item->work_id, 'title_public' => 'Obra desconocida', 'status' => 'catalog_review', 'original_language' => null]);
+        $this->assertDatabaseHas('publications', ['id' => $item->publication_id, 'asin' => 'B099999999', 'manuscript_version_id' => null]);
         $this->assertSame($item->id, KdpReportRow::firstOrFail()->kdp_catalog_item_id);
     }
 

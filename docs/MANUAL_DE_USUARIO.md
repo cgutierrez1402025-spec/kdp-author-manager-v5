@@ -63,9 +63,9 @@ Los periodos KDP Select permiten registrar inicio, fin, renovación y días de p
 6. Consulta **Sesiones de importación** para revisar archivos completados, duplicados y fallidos, y abre sus lotes si necesitas reprocesarlos.
 7. Regresa al panel para ver los gráficos actualizados.
 
-Cada título nuevo aparece automáticamente en **Publicaciones → Catálogo detectado KDP**. El estado `Pendiente de revisión` significa que KDP aportó información comercial, pero todavía no existe una obra/publicación interna con coincidencia fiable. `Vinculada` significa que ASIN y formato enlazaron con el catálogo editorial.
+Cada título nuevo aparece automáticamente en **Publicaciones → Catálogo detectado KDP** y se crea como obra/publicación provisional. `Vinculada` significa que las filas comerciales ya apuntan al catálogo editorial. La obra queda **Pendiente de completar (KDP)** hasta que se añadan idioma, clasificación y, cuando exista, manuscrito.
 
-Para incorporar un título pendiente a **Obras**, usa **Crear obra y edición**, confirma el idioma, marketplace y formato y completa después sus datos editoriales. Si la obra ya existe, usa **Vincular a obra**. No se genera un manuscrito artificial: puede asociarse más adelante desde la edición publicada.
+Si la agrupación automática no corresponde a la obra adecuada, utiliza las acciones del catálogo para revisar el vínculo. No se genera un idioma ni manuscrito artificial: deben completarse posteriormente desde la obra o edición publicada.
 
 La acción **Reprocesar** elimina únicamente las filas derivadas de ese lote y vuelve a crearlas desde el archivo original privado. Es útil después de actualizar reglas de mapeo. No elimina el archivo original.
 

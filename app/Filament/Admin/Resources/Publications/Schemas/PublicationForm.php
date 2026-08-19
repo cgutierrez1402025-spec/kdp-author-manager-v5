@@ -89,6 +89,7 @@ class PublicationForm
                             Forms\Components\Select::make('status')
                                 ->label('Estado')
                                 ->options([
+                                    'catalog_review' => 'Pendiente de completar (KDP)',
                                     'draft' => 'Borrador',
                                     'processing' => 'En proceso',
                                     'published' => 'Publicada',

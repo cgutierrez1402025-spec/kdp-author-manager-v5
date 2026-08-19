@@ -14,7 +14,7 @@ class Work extends Model
     use HasFactory, LogsActivity;
 
     protected $fillable = [
-        'user_id', 'series_id', 'series_number', 'title', 'slug', 'description',
+        'user_id', 'series_id', 'series_number', 'title', 'slug', 'kdp_identity_key', 'description',
         'title_internal', 'title_public',
         'subtitle', 'author_name', 'pen_name', 'genre', 'subgenre', 'work_type',
         'original_language', 'status', 'target_audience', 'age_recommendation',

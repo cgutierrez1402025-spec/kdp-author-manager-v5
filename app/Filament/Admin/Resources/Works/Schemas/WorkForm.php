@@ -114,6 +114,7 @@ class WorkForm
                         Forms\Components\Select::make('status')
                             ->label('Estado')
                             ->options([
+                                'catalog_review' => 'Pendiente de completar (KDP)',
                                 'idea' => 'Idea',
                                 'redaccion' => 'Redacción',
                                 'revision' => 'Revisión',

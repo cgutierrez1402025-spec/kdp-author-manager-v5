@@ -4,7 +4,7 @@ La versión 5 incorpora importación auditable de los informes CSV/XLSX descarga
 
 Cada archivo se conserva en almacenamiento privado, se registra como lote y sus filas se normalizan en `kdp_report_rows`, manteniendo también los valores originales. Las reimportaciones se detectan mediante huellas SHA-256 y las filas se vinculan con publicaciones propias por ASIN y formato cuando existe una coincidencia inequívoca.
 
-Los títulos ausentes se registran automáticamente en `kdp_catalog_items` y aparecen en **Catálogo detectado KDP**. Permanecen pendientes hasta que el autor los vincule o complete los datos editoriales que los informes de Amazon no proporcionan.
+Los títulos ausentes se registran en `kdp_catalog_items` y se materializan automáticamente como obras y publicaciones provisionales. Las obras con igual título y autor comparten identidad aunque aparezcan en varios formatos o mercados. En **Catálogo detectado KDP** pueden revisarse y completar idioma, manuscrito y clasificación, que nunca se inventan si Amazon no los proporciona.
 
 Desde ese catálogo puede utilizarse **Crear obra y edición** para incorporarlos a `works`, o **Vincular a obra** cuando ya existen. Los informes de pagos se proyectan en **Publicaciones → Pagos KDP** y permanecen sin asignar a una obra mientras Amazon no proporcione una relación inequívoca.
 

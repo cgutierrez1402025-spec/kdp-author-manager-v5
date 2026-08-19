@@ -218,6 +218,10 @@ class KdpReportImportService
                     'raw_data' => ['sheet' => $sheet, 'row' => $index + 1, 'values' => $raw],
                     'normalized_data' => $normalized,
                 ]);
+                if ($catalogItem && $reportRow->row_kind !== 'payment') {
+                    app(KdpCatalogMaterializer::class)->materialize($catalogItem);
+                    $reportRow->refresh();
+                }
                 $this->materializePayment($batch, $reportRow);
                 $counters['imported_rows']++;
             } catch (Throwable $exception) {
