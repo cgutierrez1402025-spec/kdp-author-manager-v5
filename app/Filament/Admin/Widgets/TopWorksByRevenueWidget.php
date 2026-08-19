@@ -20,8 +20,8 @@ class TopWorksByRevenueWidget extends Widget
             ->join('works', 'works.id', '=', 'publications.work_id')
             ->selectRaw('works.id, works.title_public, SUM(royalty_entries.total_royalty) AS total_revenue')
             ->groupBy('works.id', 'works.title_public')
-            ->orderByDesc('total_revenue')
-            ->limit(5);
+            ->havingRaw('SUM(COALESCE(royalty_entries.total_royalty, 0)) > 0')
+            ->orderByDesc('total_revenue');
 
         if (! auth()->user()?->canViewAllAuthorData()) {
             $query->where('works.user_id', auth()->id());

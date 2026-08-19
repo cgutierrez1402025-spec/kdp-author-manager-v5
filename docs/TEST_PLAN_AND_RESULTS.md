@@ -36,9 +36,9 @@ Fecha: 19 de agosto de 2026
 
 ## Resultado final
 
-- 92 pruebas superadas.
-- 626 aserciones correctas.
-- 22 listados y 21 formularios de edición probados con datos sembrados.
+- 93 pruebas superadas.
+- 632 aserciones correctas.
+- 23 listados y 21 formularios de edición probados con datos sembrados.
 - 105 relaciones Eloquent resueltas correctamente.
 - Migración limpia y seeders correctos.
 - Ninguna violación de claves foráneas.

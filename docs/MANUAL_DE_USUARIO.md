@@ -33,6 +33,8 @@ El bloque **Rendimiento importado desde Amazon KDP** muestra:
 - KENP por título;
 - regalías agrupadas por moneda.
 
+El panel muestra únicamente títulos, mercados, fechas y monedas con un valor agregado distinto de cero. **Obras con más ingresos** incluye todas las obras con ingresos positivos, ordenadas de mayor a menor. El enlace **Ver desglose completo** abre todas las filas importadas: primero las que contienen alguna métrica distinta de cero y, a continuación, las que todavía no tienen actividad. El desglose permite filtrar por informe y tipo de dato y acceder a la publicación relacionada.
+
 Las monedas no se suman entre sí. Un total de EUR y otro de USD aparecen separados hasta que exista una tabla de tipos de cambio.
 
 ## Catálogo editorial

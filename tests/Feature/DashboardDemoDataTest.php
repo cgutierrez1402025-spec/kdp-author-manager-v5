@@ -77,4 +77,27 @@ class DashboardDemoDataTest extends TestCase
             ->assertSee($longPublicationTitle)
             ->assertDontSee('class="truncate"', false);
     }
+
+    public function test_dashboard_only_shows_non_zero_kdp_rows_and_full_breakdown_orders_the_rest_after_them(): void
+    {
+        $this->seed();
+        $admin = User::where('email', 'admin@kdpmanager.local')->firstOrFail();
+        $this->actingAs($admin);
+        $source = KdpReportRow::where('row_kind', 'royalty')->firstOrFail();
+        $zeroRow = $source->replicate();
+        $zeroRow->fill([
+            'row_fingerprint' => hash('sha256', 'zero-dashboard-row'), 'title' => 'Obra todavía sin actividad',
+            'units_sold' => 0, 'units_refunded' => 0, 'net_units_sold' => 0, 'kenp_read' => 0,
+            'total_earnings' => 0, 'income_amount' => 0, 'normalized_data' => [],
+        ])->save();
+
+        Livewire::test(KdpImportedDataWidget::class)
+            ->assertDontSee('Obra todavía sin actividad')
+            ->assertSee('Ver desglose completo');
+        Livewire::test(TopWorksByRevenueWidget::class)
+            ->assertSeeInOrder(['Obra de demostración 20', 'Obra de demostración 01']);
+        $this->get('/admin/desglose-informes-kdp')
+            ->assertOk()
+            ->assertSeeInOrder([$source->title, 'Obra todavía sin actividad']);
+    }
 }

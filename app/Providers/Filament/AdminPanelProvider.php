@@ -15,6 +15,7 @@ use App\Filament\Admin\Resources\ImportSessions\ImportSessionResource;
 use App\Filament\Admin\Resources\KdpCatalogItems\KdpCatalogItemResource;
 use App\Filament\Admin\Resources\KdpMetadatas\KdpMetadataResource;
 use App\Filament\Admin\Resources\KdpPayments\KdpPaymentResource;
+use App\Filament\Admin\Resources\KdpReportRows\KdpReportRowResource;
 use App\Filament\Admin\Resources\KdpSelectPeriods\KdpSelectPeriodResource;
 use App\Filament\Admin\Resources\ManuscriptVersions\ManuscriptVersionResource;
 use App\Filament\Admin\Resources\Marketplaces\MarketplaceResource;
@@ -92,6 +93,7 @@ class AdminPanelProvider extends PanelProvider
                 ImportSessionResource::class,
                 KdpMetadataResource::class,
                 KdpPaymentResource::class,
+                KdpReportRowResource::class,
                 KdpCatalogItemResource::class,
                 KdpSelectPeriodResource::class,
                 ManuscriptVersionResource::class,

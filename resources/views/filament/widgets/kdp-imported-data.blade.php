@@ -1,9 +1,9 @@
 @php
     $data = $this->getDashboardData();
-    $maxTitleUnits = max(array_column($data['top_titles'], 'units') ?: [0]);
-    $maxKenp = max(array_column($data['kenp_titles'], 'pages') ?: [0]);
-    $maxMarketplace = max(array_column($data['marketplaces'], 'units') ?: [0]);
-    $maxDaily = max(array_column($data['daily_units'], 'units') ?: [0]);
+    $maxTitleUnits = max(array_map('abs', array_column($data['top_titles'], 'units')) ?: [0]);
+    $maxKenp = max(array_map('abs', array_column($data['kenp_titles'], 'pages')) ?: [0]);
+    $maxMarketplace = max(array_map('abs', array_column($data['marketplaces'], 'units')) ?: [0]);
+    $maxDaily = max(array_map('abs', array_column($data['daily_units'], 'units')) ?: [0]);
 @endphp
 
 <x-filament::section
@@ -50,7 +50,7 @@
                     @forelse($data['daily_units'] as $point)
                         <div class="flex min-w-0 flex-1 flex-col items-center justify-end gap-1">
                             <span class="text-xs font-medium">{{ $point['units'] }}</span>
-                            <div class="w-full rounded-t bg-primary-500" style="height: {{ $maxDaily > 0 ? max(4, $point['units'] / $maxDaily * 110) : 0 }}px"></div>
+                            <div class="w-full rounded-t bg-primary-500" style="height: {{ $maxDaily > 0 ? max(4, abs($point['units']) / $maxDaily * 110) : 0 }}px"></div>
                             <span class="text-[10px] text-gray-500">{{ $point['date'] }}</span>
                         </div>
                     @empty
@@ -80,7 +80,7 @@
                     @foreach($data['top_titles'] as $title)
                         <div>
                             <div class="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 text-xs"><span class="editorial-title" title="{{ $title['title'] }}">{{ $title['title'] }}</span><strong class="editorial-metric">{{ $title['units'] }}</strong></div>
-                            <div class="mt-1 h-2 overflow-hidden rounded bg-gray-100 dark:bg-gray-800"><div class="h-full rounded bg-violet-500" style="width: {{ $maxTitleUnits > 0 ? $title['units'] / $maxTitleUnits * 100 : 0 }}%"></div></div>
+                            <div class="mt-1 h-2 overflow-hidden rounded bg-gray-100 dark:bg-gray-800"><div class="h-full rounded bg-violet-500" style="width: {{ $maxTitleUnits > 0 ? abs($title['units']) / $maxTitleUnits * 100 : 0 }}%"></div></div>
                         </div>
                     @endforeach
                 </div>
@@ -92,7 +92,7 @@
                     @forelse($data['kenp_titles'] as $title)
                         <div>
                             <div class="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 text-xs"><span class="editorial-title" title="{{ $title['title'] }}">{{ $title['title'] }}</span><strong class="editorial-metric">{{ number_format($title['pages']) }}</strong></div>
-                            <div class="mt-1 h-2 overflow-hidden rounded bg-gray-100 dark:bg-gray-800"><div class="h-full rounded bg-sky-500" style="width: {{ $maxKenp > 0 ? $title['pages'] / $maxKenp * 100 : 0 }}%"></div></div>
+                            <div class="mt-1 h-2 overflow-hidden rounded bg-gray-100 dark:bg-gray-800"><div class="h-full rounded bg-sky-500" style="width: {{ $maxKenp > 0 ? abs($title['pages']) / $maxKenp * 100 : 0 }}%"></div></div>
                         </div>
                     @empty
                         <p class="text-sm text-gray-500">No hay páginas KENP en los informes cargados.</p>
@@ -106,11 +106,16 @@
                     @foreach($data['marketplaces'] as $marketplace)
                         <div>
                             <div class="flex justify-between text-xs"><span>{{ $marketplace['marketplace'] }}</span><strong>{{ $marketplace['units'] }}</strong></div>
-                            <div class="mt-1 h-2 overflow-hidden rounded bg-gray-100 dark:bg-gray-800"><div class="h-full rounded bg-amber-500" style="width: {{ $maxMarketplace > 0 ? $marketplace['units'] / $maxMarketplace * 100 : 0 }}%"></div></div>
+                            <div class="mt-1 h-2 overflow-hidden rounded bg-gray-100 dark:bg-gray-800"><div class="h-full rounded bg-amber-500" style="width: {{ $maxMarketplace > 0 ? abs($marketplace['units']) / $maxMarketplace * 100 : 0 }}%"></div></div>
                         </div>
                     @endforeach
                 </div>
             </div>
+        </div>
+        <div class="mt-5 flex justify-end border-t border-gray-100 pt-4 dark:border-white/5">
+            <a class="text-sm font-semibold text-primary-600 hover:underline dark:text-primary-400" href="{{ \App\Filament\Admin\Resources\KdpReportRows\KdpReportRowResource::getUrl('index') }}">
+                Ver desglose completo, incluidas las filas sin datos →
+            </a>
         </div>
     @endif
 </x-filament::section>

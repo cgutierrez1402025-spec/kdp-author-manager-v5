@@ -38,6 +38,7 @@ class AdminResourcesSmokeTest extends TestCase
             '/admin/event-books',
             '/admin/illustration-anchors',
             '/admin/kdp-metadata',
+            '/admin/desglose-informes-kdp',
             '/admin/kdp-select-periods',
             '/admin/manuscript-versions',
             '/admin/marketplaces',

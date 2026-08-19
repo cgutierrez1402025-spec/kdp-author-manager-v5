@@ -4,7 +4,7 @@ Fecha: 19 de agosto de 2026.
 
 ## Resultado general
 
-- 92 pruebas superadas y 626 aserciones correctas.
+- 93 pruebas superadas y 632 aserciones correctas.
 - PHPStan sin errores.
 - Pint sin desviaciones.
 - Build Vite de producción correcto.
@@ -14,6 +14,8 @@ Fecha: 19 de agosto de 2026.
 - Interfaz disponible en `http://127.0.0.1:8020/admin/login`.
 - Login, redirección del panel, CSS y JavaScript responden correctamente.
 - Los títulos largos de obras y publicaciones se muestran completos en varias líneas sin comprimir las cifras laterales.
+- El dashboard sólo presenta agregados distintos de cero; el desglose completo ordena primero las filas con actividad y conserva después las filas sin datos.
+- El bloque de obras con ingresos muestra todas las obras positivas por orden decreciente.
 
 ## Auditoría de datos KDP
 

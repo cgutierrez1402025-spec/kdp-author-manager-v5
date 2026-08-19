@@ -1,5 +1,5 @@
 @php($works = $this->getWorks())
-<x-filament::section icon="heroicon-o-trophy" heading="Obras con más ingresos" description="Las cinco obras con mayor rendimiento acumulado">
+<x-filament::section icon="heroicon-o-trophy" heading="Obras con más ingresos" description="Todas las obras con ingresos, ordenadas de mayor a menor">
     @if(empty($works))
         <div class="editorial-empty"><p class="editorial-muted">Aún no hay regalías para comparar.</p></div>
     @else
@@ -11,5 +11,8 @@
                 </li>
             @endforeach
         </ol>
+        <div class="mt-4 flex justify-end border-t border-gray-100 pt-3 dark:border-white/5">
+            <a class="text-sm font-semibold text-primary-600 hover:underline dark:text-primary-400" href="{{ \App\Filament\Admin\Resources\Works\WorkResource::getUrl('index') }}">Ver todas las obras →</a>
+        </div>
     @endif
 </x-filament::section>
