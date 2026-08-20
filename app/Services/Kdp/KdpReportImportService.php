@@ -10,8 +10,10 @@ use App\Models\KdpPaymentAllocation;
 use App\Models\KdpReportRow;
 use App\Models\KdpRoyaltyEstimate;
 use App\Models\Publication;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use RuntimeException;
@@ -84,6 +86,7 @@ class KdpReportImportService
             });
 
             $batch->update($counters + ['status' => 'completed', 'finished_at' => now()]);
+            User::query()->pluck('id')->each(fn ($userId) => Cache::forget('dashboard:user:'.$userId.':summary'));
         } catch (Throwable $exception) {
             $batch->update(['status' => 'failed', 'finished_at' => now(), 'notes' => $exception->getMessage()]);
             throw $exception;

@@ -74,6 +74,28 @@
                 </div>
             </div>
 
+            <div class="rounded-xl border border-gray-200 p-4 dark:border-gray-700 xl:col-span-2">
+                <h3 class="font-semibold text-gray-950 dark:text-white">Regalías acumuladas por obra</h3>
+                <p class="mt-1 text-xs text-gray-500">Acumulado de los informes KDP importados, separado por moneda y trazable a cada obra.</p>
+                <div class="mt-4 grid gap-5 md:grid-cols-2">
+                    @forelse($data['revenue_by_work'] as $currency => $works)
+                        <div>
+                            <h4 class="text-sm font-semibold text-emerald-700 dark:text-emerald-300">{{ $currency }}</h4>
+                            <div class="mt-2 space-y-2">
+                                @foreach($works as $work)
+                                    <div class="flex items-start justify-between gap-4 border-b border-gray-100 py-2 text-sm last:border-0 dark:border-white/5">
+                                        <span class="editorial-title">{{ $work['work'] }}</span>
+                                        <strong class="shrink-0">{{ number_format($work['total'], 2) }}</strong>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @empty
+                        <p class="text-sm text-gray-500">No hay regalías acumulables por obra.</p>
+                    @endforelse
+                </div>
+            </div>
+
             <div class="rounded-xl border border-gray-200 p-4 dark:border-gray-700">
                 <h3 class="font-semibold text-gray-950 dark:text-white">Títulos por unidades netas</h3>
                 <div class="mt-4 space-y-3">

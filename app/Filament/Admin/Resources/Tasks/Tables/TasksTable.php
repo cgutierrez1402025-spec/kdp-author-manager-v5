@@ -24,17 +24,20 @@ class TasksTable
                 TextColumn::make('work.title_public')
                     ->label('Obra')
                     ->searchable()
-                    ->placeholder('N/A'),
+                    ->placeholder('N/A')
+                    ->sortable(),
 
                 TextColumn::make('assignedTo.name')
                     ->label('Asignado a')
                     ->searchable()
+                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->placeholder('Sin asignar'),
 
                 TextColumn::make('priority')
                     ->label('Prioridad')
                     ->badge()
+                    ->sortable()
                     ->formatStateUsing(fn (?string $state): string => match ($state) {
                         'low' => 'Baja', 'medium' => 'Media', 'high' => 'Alta', 'urgent' => 'Urgente', default => ucfirst((string) $state),
                     })
@@ -49,6 +52,7 @@ class TasksTable
                 TextColumn::make('status')
                     ->label('Estado')
                     ->badge()
+                    ->sortable()
                     ->formatStateUsing(fn (?string $state): string => match ($state) {
                         'pending' => 'Pendiente', 'in_progress' => 'En progreso', 'completed' => 'Completada', 'cancelled' => 'Cancelada', default => ucfirst((string) $state),
                     })

@@ -71,22 +71,26 @@ class KdpMetadataRelationManager extends RelationManager
             ->columns([
                 TextColumn::make('title')
                     ->label('Título')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
 
                 TextColumn::make('subtitle')
                     ->label('Subtítulo')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
 
                 TextColumn::make('author')
-                    ->label('Autor'),
+                    ->label('Autor')
+                    ->sortable(),
 
                 TextColumn::make('series_name')
-                    ->label('Serie'),
+                    ->label('Serie')
+                    ->sortable(),
             ])
             ->actions([
                 EditAction::make(),
             ])
-            ->bulkActions([
+            ->headerActions([
                 CreateAction::make()
                     ->slideOver(),
             ]);

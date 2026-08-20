@@ -134,15 +134,26 @@ class KdpBulkImportService
         abort_unless($session->user_id === auth()->id() || auth()->user()?->canViewAllAuthorData(), 403);
         $session->update(['status' => 'processing', 'completed_files' => 0, 'failed_files' => 0, 'imported_rows' => 0, 'skipped_rows' => 0, 'error_rows' => 0, 'started_at' => now(), 'finished_at' => null]);
 
-        foreach ($session->batches as $batch) {
+        $errors = [];
+        foreach ($session->batches()->get() as $batch) {
             try {
                 $this->importer->reprocess($batch);
                 $session->increment('completed_files');
-            } catch (Throwable) {
+            } catch (Throwable $exception) {
+                report($exception);
+                $errors[] = $batch->original_file_name.': '.$exception->getMessage();
                 $session->increment('failed_files');
             }
         }
         $this->summarize($session);
+
+        if ($errors !== []) {
+            $session->update([
+                'status' => 'partial',
+                'failed_files' => count($errors),
+                'notes' => 'Errores durante el reprocesado: '.implode(' | ', $errors),
+            ]);
+        }
 
         return $session->refresh();
     }

@@ -34,6 +34,23 @@ class KdpImportedDataWidget extends Widget
             ->map(fn (KdpReportRow $row) => ['currency' => $row->currency, 'total' => (float) $row->total])
             ->all();
 
+        $revenueByWork = (clone $rows)
+            ->where('row_kind', 'royalty')
+            ->leftJoin('publications', 'publications.id', '=', 'kdp_report_rows.publication_id')
+            ->leftJoin('works', 'works.id', '=', 'publications.work_id')
+            ->selectRaw("COALESCE(works.title_public, kdp_report_rows.title, 'Sin obra vinculada') AS work_title, kdp_report_rows.currency, SUM(COALESCE(kdp_report_rows.total_earnings, 0)) AS total")
+            ->groupBy('works.id', 'works.title_public', 'kdp_report_rows.title', 'kdp_report_rows.currency')
+            ->havingRaw('SUM(COALESCE(kdp_report_rows.total_earnings, 0)) <> 0')
+            ->orderBy('kdp_report_rows.currency')
+            ->orderByDesc('total')
+            ->get()
+            ->groupBy(fn (KdpReportRow $row): string => $row->currency ?: 'Sin moneda')
+            ->map(fn ($currencyRows) => $currencyRows->map(fn (KdpReportRow $row): array => [
+                'work' => $row->work_title,
+                'total' => (float) $row->total,
+            ])->values()->all())
+            ->all();
+
         $topTitles = (clone $rows)
             ->where('row_kind', 'royalty')
             ->whereNotNull('title')
@@ -91,6 +108,7 @@ class KdpImportedDataWidget extends Widget
             'total_kenp' => (int) (clone $rows)->where('row_kind', 'kenp')->sum('kenp_read'),
             'titles' => (int) (clone $rows)->whereNotNull('asin')->distinct()->count('asin'),
             'revenue_by_currency' => $revenueByCurrency,
+            'revenue_by_work' => $revenueByWork,
             'top_titles' => $topTitles,
             'kenp_titles' => $kenpTitles,
             'marketplaces' => $marketplaces,

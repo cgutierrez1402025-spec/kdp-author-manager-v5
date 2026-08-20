@@ -106,8 +106,8 @@ class ImportBatchResource extends Resource
         return $table
             ->defaultSort('created_at', 'desc')
             ->columns([
-                Tables\Columns\TextColumn::make('import_session_id')->label('Sesión')->formatStateUsing(fn ($state) => $state ? '#'.$state : 'Individual')->badge(),
-                Tables\Columns\TextColumn::make('original_file_name')->label('Archivo')->searchable(),
+                Tables\Columns\TextColumn::make('import_session_id')->label('Sesión')->formatStateUsing(fn ($state) => $state ? '#'.$state : 'Individual')->badge()->sortable(),
+                Tables\Columns\TextColumn::make('original_file_name')->label('Archivo')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('import_type')->label('Informe')->formatStateUsing(fn (string $state) => match ($state) {
                     'prior_royalties' => 'Regalías anteriores',
                     'sales_royalties' => 'Ventas y regalías',
@@ -120,18 +120,18 @@ class ImportBatchResource extends Resource
                     'historical' => 'Histórico',
                     'unknown' => 'Pendiente de revisión',
                     default => $state,
-                }),
+                })->sortable(),
                 Tables\Columns\TextColumn::make('report_period')->label('Periodo')->date('m/Y')->sortable(),
-                Tables\Columns\TextColumn::make('status')->label('Estado')->badge()->color(fn (string $state) => match ($state) {
+                Tables\Columns\TextColumn::make('status')->label('Estado')->badge()->sortable()->color(fn (string $state) => match ($state) {
                     'completed' => 'success',
                     'failed' => 'danger',
                     'processing' => 'warning',
                     'needs_review' => 'warning',
                     default => 'gray',
                 }),
-                Tables\Columns\TextColumn::make('imported_rows')->label('Importadas')->numeric(),
-                Tables\Columns\TextColumn::make('skipped_rows')->label('Duplicadas')->numeric(),
-                Tables\Columns\TextColumn::make('error_rows')->label('Errores')->numeric()->color('danger'),
+                Tables\Columns\TextColumn::make('imported_rows')->label('Importadas')->numeric()->sortable(),
+                Tables\Columns\TextColumn::make('skipped_rows')->label('Duplicadas')->numeric()->sortable(),
+                Tables\Columns\TextColumn::make('error_rows')->label('Errores')->numeric()->sortable()->color('danger'),
                 Tables\Columns\TextColumn::make('created_at')->label('Fecha de carga')->dateTime('d/m/Y H:i')->sortable(),
             ])
             ->actions([

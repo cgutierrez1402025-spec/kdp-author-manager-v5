@@ -32,12 +32,12 @@ class MarketObservationsRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table->defaultSort('observed_at', 'desc')->columns([
-            Tables\Columns\TextColumn::make('observed_at')->label('Fecha')->date('d/m/Y'),
-            Tables\Columns\TextColumn::make('marketplace.name')->label('Mercado'),
-            Tables\Columns\TextColumn::make('average_rating')->label('Valoración')->numeric(2),
-            Tables\Columns\TextColumn::make('review_count')->label('Reseñas')->numeric(),
-            Tables\Columns\TextColumn::make('overall_rank')->label('Ranking')->numeric(),
-            Tables\Columns\TextColumn::make('category_rank')->label('Ranking categoría')->numeric(),
+            Tables\Columns\TextColumn::make('observed_at')->label('Fecha')->date('d/m/Y')->sortable(),
+            Tables\Columns\TextColumn::make('marketplace.name')->label('Mercado')->sortable(),
+            Tables\Columns\TextColumn::make('average_rating')->label('Valoración')->numeric(2)->sortable(),
+            Tables\Columns\TextColumn::make('review_count')->label('Reseñas')->numeric()->sortable(),
+            Tables\Columns\TextColumn::make('overall_rank')->label('Ranking')->numeric()->sortable(),
+            Tables\Columns\TextColumn::make('category_rank')->label('Ranking categoría')->numeric()->sortable(),
         ])->headerActions([Tables\Actions\CreateAction::make()])->actions([Tables\Actions\EditAction::make(), Tables\Actions\DeleteAction::make()]);
     }
 }

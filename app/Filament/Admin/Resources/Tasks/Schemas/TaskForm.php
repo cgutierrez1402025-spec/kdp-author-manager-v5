@@ -19,7 +19,17 @@ class TaskForm
                             ->searchable()
                             ->preload()
                             ->label('Obra')
+                            ->live()
+                            ->afterStateUpdated(fn ($set) => $set('publication_id', null))
                             ->required(),
+
+                        Forms\Components\Select::make('publication_id')
+                            ->relationship('publication', 'asin', modifyQueryUsing: fn ($query, $get) => $query->where('work_id', $get('work_id')))
+                            ->label('Publicación (opcional)')
+                            ->helperText('Déjalo vacío para una tarea general de la obra; selecciónalo para una edición concreta.')
+                            ->searchable()
+                            ->getOptionLabelFromRecordUsing(fn ($record): string => trim(($record->asin ?: 'Sin ASIN').' · '.($record->format ?: 'Sin formato')))
+                            ->nullable(),
 
                         Forms\Components\Select::make('assigned_to')
                             ->relationship('assignedTo', 'name')
@@ -37,7 +47,8 @@ class TaskForm
                             ->columnSpanFull(),
 
                         Forms\Components\Select::make('task_type')
-                            ->label('Tipo')
+                            ->label('Tipo heredado')
+                            ->helperText('Se conserva para compatibilidad con tareas antiguas.')
                             ->options([
                                 'writing' => 'Escritura',
                                 'editing' => 'Edición',
@@ -46,6 +57,17 @@ class TaskForm
                                 'publishing' => 'Publicación',
                                 'marketing' => 'Marketing',
                             ]),
+
+                        Forms\Components\Select::make('task_type_id')
+                            ->relationship('taskType', 'name', modifyQueryUsing: fn ($query) => $query->where('is_active', true))
+                            ->label('Tipo de tarea')
+                            ->createOptionForm([
+                                Forms\Components\TextInput::make('name')->label('Nombre')->required(),
+                                Forms\Components\TextInput::make('description')->label('Descripción'),
+                            ])
+                            ->searchable()
+                            ->preload()
+                            ->nullable(),
 
                         Forms\Components\Select::make('priority')
                             ->label('Prioridad')

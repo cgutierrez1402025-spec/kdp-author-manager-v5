@@ -20,10 +20,10 @@ class TasksRelationManager extends RelationManager
     {
         return $table
             ->columns([
-                TextColumn::make('title')->label('Tarea')->searchable(),
-                TextColumn::make('priority')->label('Prioridad')->badge(),
-                TextColumn::make('status')->label('Estado')->badge(),
-                TextColumn::make('due_date')->label('Vencimiento')->date(),
+                TextColumn::make('title')->label('Tarea')->searchable()->sortable(),
+                TextColumn::make('priority')->label('Prioridad')->badge()->sortable(),
+                TextColumn::make('status')->label('Estado')->badge()->sortable(),
+                TextColumn::make('due_date')->label('Vencimiento')->date()->sortable(),
             ])
             ->headerActions([
                 Action::make('create')

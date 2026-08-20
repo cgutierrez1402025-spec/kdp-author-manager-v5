@@ -23,10 +23,10 @@ class ManuscriptVersionsRelationManager extends RelationManager
             ->recordTitleAttribute('version_number')
             ->columns([
                 TextColumn::make('version_number')->label('Versión')->prefix('v')->sortable(),
-                TextColumn::make('status')->label('Estado')->badge(),
-                TextColumn::make('word_count')->label('Palabras')->numeric(),
-                IconColumn::make('is_final')->label('Final')->boolean(),
-                TextColumn::make('updated_at')->label('Actualizada')->since(),
+                TextColumn::make('status')->label('Estado')->badge()->sortable(),
+                TextColumn::make('word_count')->label('Palabras')->numeric()->sortable(),
+                IconColumn::make('is_final')->label('Final')->boolean()->sortable(),
+                TextColumn::make('updated_at')->label('Actualizada')->since()->sortable(),
             ])
             ->headerActions([
                 Action::make('create')

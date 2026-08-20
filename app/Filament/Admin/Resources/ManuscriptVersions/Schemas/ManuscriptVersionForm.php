@@ -4,6 +4,8 @@ namespace App\Filament\Admin\Resources\ManuscriptVersions\Schemas;
 
 use Filament\Forms;
 use Filament\Forms\Form;
+use App\Models\Language;
+use Filament\Forms\Components\FileUpload;
 
 class ManuscriptVersionForm
 {
@@ -37,6 +39,7 @@ class ManuscriptVersionForm
                                 modifyQueryUsing: fn ($query, $get) => $query->where('work_id', $get('work_id')),
                             )
                             ->label('Idioma')
+                            ->getOptionLabelFromRecordUsing(fn ($record): string => Language::query()->where('code', $record->language_code)->value('name') ?? $record->language_code)
                             ->required()
                             ->live(),
 
@@ -89,9 +92,14 @@ class ManuscriptVersionForm
                             ->required()
                             ->columnSpanFull(),
 
-                        Forms\Components\TextInput::make('file_path')
+                        FileUpload::make('file_path')
                             ->label('Archivo')
-                            ->maxLength(512),
+                            ->helperText('Selecciona o sube el fichero del manuscrito. La aplicación guardará la ruta relativa dentro del almacenamiento configurado.')
+                            ->disk('local')
+                            ->directory('manuscripts')
+                            ->preserveFilenames()
+                            ->downloadable()
+                            ->openable(),
                     ]),
 
                 Forms\Components\Section::make('Opciones')

@@ -16,7 +16,8 @@ class ChecklistsTable
             ->columns([
                 TextColumn::make('work.title_public')
                     ->label('Obra')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
 
                 TextColumn::make('name')
                     ->label('Nombre')
@@ -25,11 +26,13 @@ class ChecklistsTable
 
                 TextColumn::make('progress_percentage')
                     ->label('Progreso')
-                    ->suffix('%'),
+                    ->suffix('%')
+                    ->sortable(),
 
                 TextColumn::make('items_count')
                     ->label('Items')
-                    ->counts('items'),
+                    ->counts('items')
+                    ->sortable(),
 
                 TextColumn::make('created_at')
                     ->label('Creado')

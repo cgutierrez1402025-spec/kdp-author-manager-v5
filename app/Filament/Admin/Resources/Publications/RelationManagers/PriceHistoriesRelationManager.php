@@ -30,11 +30,11 @@ class PriceHistoriesRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table->defaultSort('starts_at', 'desc')->columns([
-            Tables\Columns\TextColumn::make('marketplace.name')->label('Mercado'),
-            Tables\Columns\TextColumn::make('price')->label('Precio')->money(fn ($record) => $record->currency),
-            Tables\Columns\TextColumn::make('starts_at')->label('Desde')->date('d/m/Y'),
-            Tables\Columns\TextColumn::make('ends_at')->label('Hasta')->date('d/m/Y')->placeholder('Vigente'),
-            Tables\Columns\TextColumn::make('change_reason')->label('Motivo')->badge(),
+            Tables\Columns\TextColumn::make('marketplace.name')->label('Mercado')->sortable(),
+            Tables\Columns\TextColumn::make('price')->label('Precio')->money(fn ($record) => $record->currency)->sortable(),
+            Tables\Columns\TextColumn::make('starts_at')->label('Desde')->date('d/m/Y')->sortable(),
+            Tables\Columns\TextColumn::make('ends_at')->label('Hasta')->date('d/m/Y')->placeholder('Vigente')->sortable(),
+            Tables\Columns\TextColumn::make('change_reason')->label('Motivo')->badge()->sortable(),
         ])->headerActions([Tables\Actions\CreateAction::make()])->actions([Tables\Actions\EditAction::make(), Tables\Actions\DeleteAction::make()]);
     }
 }

@@ -17,11 +17,13 @@ class EventBooksTable
             ->columns([
                 TextColumn::make('bookEvent.title')
                     ->label('Evento')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
 
                 TextColumn::make('work.title_public')
                     ->label('Obra')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
 
                 TextColumn::make('copies_brought')
                     ->label('Llevadas')

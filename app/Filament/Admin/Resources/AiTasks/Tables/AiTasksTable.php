@@ -17,16 +17,19 @@ class AiTasksTable
             ->columns([
                 TextColumn::make('work.title_public')
                     ->label('Obra')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
 
                 TextColumn::make('task_type')
                     ->label('Tipo')
                     ->searchable()
-                    ->badge(),
+                    ->badge()
+                    ->sortable(),
 
                 TextColumn::make('preferredAiTool.name')
                     ->label('Herramienta')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
 
                 TextColumn::make('created_at')
                     ->label('Creado')

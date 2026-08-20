@@ -17,7 +17,8 @@ class ChecklistForm
                             ->relationship('work', 'title_public', modifyQueryUsing: fn ($query) => auth()->user()?->hasRole('admin') ? $query : $query->where('user_id', auth()->id())
                             )
                             ->label('Obra')
-                            ->required(),
+                            ->required()
+                            ->helperText('Una checklist agrupa comprobaciones reutilizables de una obra; sus elementos se gestionan en la pestaña Elementos.'),
 
                         Forms\Components\TextInput::make('name')
                             ->label('Nombre')

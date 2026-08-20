@@ -89,7 +89,8 @@ class DailyResultsRelationManager extends RelationManager
 
                 TextColumn::make('total_units')
                     ->label('Total Unidades')
-                    ->state(fn (PromotionDailyResult $record) => $record->paid_units + $record->free_units_promo + $record->free_units_price_match),
+                    ->state(fn (PromotionDailyResult $record) => $record->paid_units + $record->free_units_promo + $record->free_units_price_match)
+                    ->sortable(query: fn ($query, string $direction) => $query->orderByRaw('(paid_units + free_units_promo + free_units_price_match) '.$direction)),
 
                 TextColumn::make('paid_units')
                     ->label('Pagadas')

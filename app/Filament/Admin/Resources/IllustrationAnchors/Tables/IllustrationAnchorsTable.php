@@ -23,25 +23,30 @@ class IllustrationAnchorsTable
                 TextColumn::make('illustration.title')
                     ->label('Ilustración')
                     ->searchable()
-                    ->placeholder('N/A'),
+                    ->placeholder('N/A')
+                    ->sortable(),
 
                 TextColumn::make('manuscriptVersion.name')
                     ->label('Versión Manuscrito')
                     ->searchable()
-                    ->placeholder('N/A'),
+                    ->placeholder('N/A')
+                    ->sortable(),
 
                 TextColumn::make('anchor_type')
                     ->label('Tipo')
                     ->badge()
+                    ->sortable()
                     ->color('primary'),
 
                 TextColumn::make('position_type')
                     ->label('Posición')
-                    ->placeholder('N/A'),
+                    ->placeholder('N/A')
+                    ->sortable(),
 
                 IconColumn::make('applied')
                     ->label('Aplicado')
                     ->boolean()
+                    ->sortable()
                     ->trueIcon('heroicon-o-check-circle')
                     ->falseIcon('heroicon-o-x-circle'),
 

@@ -77,4 +77,9 @@ class Publication extends Model
     {
         return $this->hasOne(KdpMetadata::class);
     }
+
+    public function tasks(): HasMany
+    {
+        return $this->hasMany(Task::class);
+    }
 }

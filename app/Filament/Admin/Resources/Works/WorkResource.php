@@ -127,6 +127,7 @@ class WorkResource extends Resource
     {
         return [
             RelationManagers\ManuscriptVersionsRelationManager::class,
+            RelationManagers\WorkLanguagesRelationManager::class,
             RelationManagers\PublicationsRelationManager::class,
             RelationManagers\TasksRelationManager::class,
             RelationManagers\SourcesRelationManager::class,

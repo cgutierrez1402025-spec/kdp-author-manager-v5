@@ -13,6 +13,8 @@ class Task extends Model
 
     protected $fillable = [
         'work_id',
+        'publication_id',
+        'task_type_id',
         'assigned_to',
         'title',
         'description',
@@ -32,6 +34,16 @@ class Task extends Model
     public function work(): BelongsTo
     {
         return $this->belongsTo(Work::class);
+    }
+
+    public function publication(): BelongsTo
+    {
+        return $this->belongsTo(Publication::class);
+    }
+
+    public function taskType(): BelongsTo
+    {
+        return $this->belongsTo(TaskType::class);
     }
 
     public function assignedTo(): BelongsTo

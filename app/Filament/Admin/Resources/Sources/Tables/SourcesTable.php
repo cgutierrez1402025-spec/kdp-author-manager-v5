@@ -18,20 +18,24 @@ class SourcesTable
             ->columns([
                 TextColumn::make('work.title_public')
                     ->label('Obra')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
 
                 TextColumn::make('title')
                     ->label('Título')
                     ->searchable()
-                    ->limit(50),
+                    ->limit(50)
+                    ->sortable(),
 
                 TextColumn::make('author')
                     ->label('Autor')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
 
                 TextColumn::make('source_type')
                     ->label('Tipo')
                     ->badge()
+                    ->sortable()
                     ->color(fn (?string $state): string => match ($state) {
                         'book' => 'primary',
                         'article' => 'info',
@@ -42,11 +46,13 @@ class SourcesTable
 
                 TextColumn::make('language_code')
                     ->label('Idioma')
-                    ->badge(),
+                    ->badge()
+                    ->sortable(),
 
                 TextColumn::make('year')
                     ->label('Año')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
 
                 TextColumn::make('created_at')
                     ->label('Creado')

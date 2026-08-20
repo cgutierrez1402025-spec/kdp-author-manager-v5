@@ -31,6 +31,10 @@ class ComprehensiveDemoSeeder extends Seeder
                 'description' => 'Serie de demostración que agrupa varias obras relacionadas.',
             ]);
             DB::table('works')->where('id', $work->id)->update(['series_id' => $series, 'series_number' => 1]);
+            $genreId = DB::table('genres')->where('slug', 'ficcion')->value('id');
+            $subgenreId = DB::table('subgenres')->where('slug', 'novela')->value('id');
+            DB::table('genre_work')->insertOrIgnore(['genre_id' => $genreId, 'work_id' => $work->id]);
+            DB::table('subgenre_work')->insertOrIgnore(['subgenre_id' => $subgenreId, 'work_id' => $work->id]);
 
             $edition = $this->record('editions', ['work_id' => $work->id, 'work_language_id' => $language->id, 'edition_number' => 1], [
                 'edition_name' => 'Primera edición revisada', 'edition_type' => 'commercial', 'notes' => 'Edición demo lista para publicación.',

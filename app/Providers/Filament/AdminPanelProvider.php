@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Admin\Pages\Dashboard;
+use App\Filament\Admin\Pages\Help;
 use App\Filament\Admin\Resources\AiTasks\AiTaskResource;
 use App\Filament\Admin\Resources\AudiobookEditions\AudiobookEditionResource;
 use App\Filament\Admin\Resources\BookEvents\BookEventResource;
@@ -17,6 +18,7 @@ use App\Filament\Admin\Resources\KdpMetadatas\KdpMetadataResource;
 use App\Filament\Admin\Resources\KdpPayments\KdpPaymentResource;
 use App\Filament\Admin\Resources\KdpReportRows\KdpReportRowResource;
 use App\Filament\Admin\Resources\KdpSelectPeriods\KdpSelectPeriodResource;
+use App\Filament\Admin\Resources\Languages\LanguageResource;
 use App\Filament\Admin\Resources\ManuscriptVersions\ManuscriptVersionResource;
 use App\Filament\Admin\Resources\Marketplaces\MarketplaceResource;
 use App\Filament\Admin\Resources\Narrators\NarratorResource;
@@ -96,6 +98,7 @@ class AdminPanelProvider extends PanelProvider
                 KdpReportRowResource::class,
                 KdpCatalogItemResource::class,
                 KdpSelectPeriodResource::class,
+                LanguageResource::class,
                 ManuscriptVersionResource::class,
                 MarketplaceResource::class,
                 NarratorResource::class,
@@ -112,6 +115,7 @@ class AdminPanelProvider extends PanelProvider
             ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\\Filament\\Admin\\Pages')
             ->pages([
                 Dashboard::class,
+                Help::class,
             ])
             ->widgets([
                 SummaryCardsWidget::class,

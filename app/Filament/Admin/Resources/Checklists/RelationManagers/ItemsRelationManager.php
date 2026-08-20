@@ -42,17 +42,20 @@ class ItemsRelationManager extends RelationManager
             ->columns([
                 TextColumn::make('item')
                     ->label('Elemento')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
 
                 IconColumn::make('is_checked')  // ✅ Corregido: BooleanColumn → IconColumn
                     ->label('Completado')
                     ->boolean()
+                    ->sortable()
                     ->trueIcon('heroicon-o-check-circle')
                     ->falseIcon('heroicon-o-x-circle'),
 
                 TextColumn::make('checkedBy.name')
                     ->label('Completado por')
-                    ->placeholder('N/A'),
+                    ->placeholder('N/A')
+                    ->sortable(),
             ])
             ->headerActions([  // ✅ Corregido: toolbarActions() → headerActions()
                 CreateAction::make(),

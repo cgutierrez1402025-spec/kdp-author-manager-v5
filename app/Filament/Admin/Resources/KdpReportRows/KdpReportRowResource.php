@@ -29,19 +29,25 @@ class KdpReportRowResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\IconColumn::make('has_non_zero')->label('Con datos')->boolean()->sortable(),
-                Tables\Columns\TextColumn::make('title')->label('Título')->searchable()->wrap()->width('24rem'),
-                Tables\Columns\TextColumn::make('author')->label('Autor')->searchable()->wrap()->toggleable(),
-                Tables\Columns\TextColumn::make('asin')->label('ASIN')->searchable()->copyable(),
-                Tables\Columns\TextColumn::make('report_type')->label('Informe')->badge(),
-                Tables\Columns\TextColumn::make('row_kind')->label('Tipo de dato')->badge(),
+                Tables\Columns\TextColumn::make('title')->label('Título')->searchable()->sortable()->wrap()->width('24rem'),
+                Tables\Columns\TextColumn::make('author')->label('Autor')->searchable()->sortable()->wrap()->toggleable(),
+                Tables\Columns\TextColumn::make('asin')->label('ASIN')->searchable()->sortable()->copyable(),
+                Tables\Columns\TextColumn::make('report_type')->label('Informe')->badge()->sortable(),
+                Tables\Columns\TextColumn::make('row_kind')->label('Tipo de dato')->badge()->sortable(),
                 Tables\Columns\TextColumn::make('transaction_date')->label('Fecha')->date('d/m/Y')->sortable(),
                 Tables\Columns\TextColumn::make('report_period')->label('Periodo')->date('m/Y')->sortable(),
                 Tables\Columns\TextColumn::make('net_units_sold')->label('Unidades netas')->numeric()->sortable(),
                 Tables\Columns\TextColumn::make('kenp_read')->label('KENP')->numeric()->sortable(),
-                Tables\Columns\TextColumn::make('total_earnings')->label('Regalías')->numeric(2)->sortable(),
-                Tables\Columns\TextColumn::make('currency')->label('Moneda'),
-                Tables\Columns\TextColumn::make('marketplace')->label('Marketplace')->toggleable(),
-                Tables\Columns\TextColumn::make('importBatch.original_file_name')->label('Archivo')->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('total_earnings')
+                    ->label('Regalías')
+                    ->numeric(2)
+                    ->sortable(query: fn (Builder $query, string $direction): Builder => $query
+                        ->reorder()
+                        ->orderBy('kdp_report_rows.total_earnings', $direction)
+                        ->orderBy('kdp_report_rows.id', $direction)),
+                Tables\Columns\TextColumn::make('currency')->label('Moneda')->sortable(),
+                Tables\Columns\TextColumn::make('marketplace')->label('Marketplace')->sortable()->toggleable(),
+                Tables\Columns\TextColumn::make('importBatch.original_file_name')->label('Archivo')->sortable()->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\Filter::make('with_data')

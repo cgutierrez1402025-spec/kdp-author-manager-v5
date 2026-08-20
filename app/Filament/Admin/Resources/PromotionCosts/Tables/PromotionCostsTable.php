@@ -19,11 +19,13 @@ class PromotionCostsTable
                 TextColumn::make('bookPromotion.promotion_name')
                     ->label('Promoción')
                     ->searchable()
-                    ->limit(30),
+                    ->limit(30)
+                    ->sortable(),
 
                 TextColumn::make('cost_type')
                     ->label('Tipo')
                     ->badge()
+                    ->sortable()
                     ->color(fn (?string $state): string => match ($state) {
                         'advertising' => 'primary',
                         'promotion' => 'warning',
@@ -34,7 +36,8 @@ class PromotionCostsTable
 
                 TextColumn::make('description')
                     ->label('Descripción')
-                    ->limit(30),
+                    ->limit(30)
+                    ->sortable(),
 
                 TextColumn::make('amount')
                     ->label('Importe')

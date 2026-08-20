@@ -19,26 +19,32 @@ class SourceUsagesTable
                 TextColumn::make('source.title')
                     ->label('Fuente')
                     ->limit(40)
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
 
                 TextColumn::make('work.title_public')
                     ->label('Obra')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
 
                 TextColumn::make('manuscriptVersion.version_number')
                     ->label('Versión')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
 
                 TextColumn::make('chapter.title')
                     ->label('Capítulo')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
 
                 TextColumn::make('usage_type')
                     ->label('Tipo')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
 
                 ToggleColumn::make('verified')
-                    ->label('Verificado'),
+                    ->label('Verificado')
+                    ->sortable(),
 
                 TextColumn::make('created_at')
                     ->label('Creado')

@@ -20,11 +20,11 @@ class PublicationsRelationManager extends RelationManager
     {
         return $table
             ->columns([
-                TextColumn::make('format')->label('Formato')->badge(),
-                TextColumn::make('marketplace.name')->label('Marketplace'),
-                TextColumn::make('status')->label('Estado')->badge(),
-                TextColumn::make('asin')->label('ASIN')->copyable(),
-                TextColumn::make('publication_date')->label('Publicación')->date(),
+                TextColumn::make('format')->label('Formato')->badge()->sortable(),
+                TextColumn::make('marketplace.name')->label('Marketplace')->sortable(),
+                TextColumn::make('status')->label('Estado')->badge()->sortable(),
+                TextColumn::make('asin')->label('ASIN')->copyable()->sortable(),
+                TextColumn::make('publication_date')->label('Publicación')->date()->sortable(),
             ])
             ->headerActions([
                 Action::make('create')

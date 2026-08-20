@@ -48,11 +48,11 @@ class NarratorResource extends Resource
     public static function table(Table $table): Table
     {
         return $table->columns([
-            Tables\Columns\TextColumn::make('name')->label('Nombre')->searchable(),
-            Tables\Columns\TextColumn::make('stage_name')->label('Nombre artístico'),
-            Tables\Columns\TextColumn::make('narrator_type')->label('Tipo')->badge(),
-            Tables\Columns\IconColumn::make('voice_consent')->label('Consentimiento')->boolean(),
-            Tables\Columns\TextColumn::make('consent_expires_at')->label('Caduca')->date('d/m/Y'),
+            Tables\Columns\TextColumn::make('name')->label('Nombre')->searchable()->sortable(),
+            Tables\Columns\TextColumn::make('stage_name')->label('Nombre artístico')->sortable(),
+            Tables\Columns\TextColumn::make('narrator_type')->label('Tipo')->badge()->sortable(),
+            Tables\Columns\IconColumn::make('voice_consent')->label('Consentimiento')->boolean()->sortable(),
+            Tables\Columns\TextColumn::make('consent_expires_at')->label('Caduca')->date('d/m/Y')->sortable(),
         ])->actions([Tables\Actions\EditAction::make()]);
     }
 

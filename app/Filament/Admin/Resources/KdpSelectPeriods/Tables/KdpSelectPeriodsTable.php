@@ -19,7 +19,8 @@ class KdpSelectPeriodsTable
             ->columns([
                 TextColumn::make('publication.work.title_public')
                     ->label('Obra')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
 
                 TextColumn::make('start_date')
                     ->label('Inicio')
@@ -33,11 +34,13 @@ class KdpSelectPeriodsTable
 
                 TextColumn::make('free_promo_days_remaining')
                     ->label('Días Restantes')
-                    ->numeric(),
+                    ->numeric()
+                    ->sortable(),
 
                 TextColumn::make('status')
                     ->label('Estado')
                     ->badge()
+                    ->sortable()
                     ->color(fn (?string $state): string => match ($state) {
                         'active' => 'success',
                         'expired' => 'warning',
@@ -47,7 +50,8 @@ class KdpSelectPeriodsTable
 
                 IconColumn::make('auto_renewal')
                     ->label('Auto Renovación')
-                    ->boolean(),
+                    ->boolean()
+                    ->sortable(),
 
                 TextColumn::make('created_at')
                     ->label('Creado')

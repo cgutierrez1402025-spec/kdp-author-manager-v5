@@ -22,11 +22,13 @@ class PlatformsTable
                 TextColumn::make('description')
                     ->label('Descripción')
                     ->limit(50)
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
 
                 TextColumn::make('marketplaces_count')
                     ->label('Marketplaces')
-                    ->counts('marketplaces'),
+                    ->counts('marketplaces')
+                    ->sortable(),
 
                 TextColumn::make('created_at')
                     ->label('Creado')

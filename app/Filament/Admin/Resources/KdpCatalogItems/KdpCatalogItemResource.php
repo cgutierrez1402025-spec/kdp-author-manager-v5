@@ -39,15 +39,15 @@ class KdpCatalogItemResource extends Resource
         return $table
             ->defaultSort('last_seen_at', 'desc')
             ->columns([
-                Tables\Columns\TextColumn::make('title')->label('Título')->searchable()->limit(60)->tooltip(fn (KdpCatalogItem $record) => $record->title),
-                Tables\Columns\TextColumn::make('author')->label('Autor')->searchable(),
-                Tables\Columns\TextColumn::make('asin')->label('ASIN')->searchable()->copyable(),
-                Tables\Columns\TextColumn::make('isbn')->label('ISBN')->searchable()->toggleable(),
-                Tables\Columns\TextColumn::make('format')->label('Formato')->badge(),
-                Tables\Columns\TextColumn::make('work.title_public')->label('Obra vinculada')->searchable()->toggleable(),
+                Tables\Columns\TextColumn::make('title')->label('Título')->searchable()->sortable()->limit(60)->tooltip(fn (KdpCatalogItem $record) => $record->title),
+                Tables\Columns\TextColumn::make('author')->label('Autor')->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('asin')->label('ASIN')->searchable()->sortable()->copyable(),
+                Tables\Columns\TextColumn::make('isbn')->label('ISBN')->searchable()->sortable()->toggleable(),
+                Tables\Columns\TextColumn::make('format')->label('Formato')->badge()->sortable(),
+                Tables\Columns\TextColumn::make('work.title_public')->label('Obra vinculada')->searchable()->sortable()->toggleable(),
                 Tables\Columns\TextColumn::make('report_rows_count')->counts('reportRows')->label('Filas origen')->numeric()->sortable(),
                 Tables\Columns\TextColumn::make('marketplaces')->label('Marketplaces')->formatStateUsing(fn ($state) => implode(', ', is_array($state) ? $state : []))->wrap(),
-                Tables\Columns\TextColumn::make('review_status')->label('Estado')->badge()->formatStateUsing(fn (string $state) => match ($state) {
+                Tables\Columns\TextColumn::make('review_status')->label('Estado')->badge()->sortable()->formatStateUsing(fn (string $state) => match ($state) {
                     'linked' => 'Vinculada','ignored' => 'Ignorada','ambiguous' => 'Ambigua','incomplete' => 'Incompleta',default => 'Pendiente de revisión'
                 })->color(fn (string $state) => match ($state) {
                     'linked' => 'success','ignored' => 'gray','ambiguous' => 'danger',default => 'warning'

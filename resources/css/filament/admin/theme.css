@@ -106,6 +106,21 @@ html {
     @apply min-w-0;
 }
 
+.fi-ta-ctn {
+    overflow-x: auto;
+}
+
+.fi-ta-table {
+    min-width: max-content;
+}
+
+.fi-ta-table thead th {
+    min-width: 7rem;
+    resize: horizontal;
+    overflow: auto;
+    cursor: col-resize;
+}
+
 .fi-btn {
     @apply rounded-xl;
 }

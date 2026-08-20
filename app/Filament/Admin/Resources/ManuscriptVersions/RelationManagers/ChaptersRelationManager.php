@@ -27,14 +27,17 @@ class ChaptersRelationManager extends RelationManager
 
                 TextColumn::make('title')
                     ->label('Título')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
 
                 TextColumn::make('level')
-                    ->label('Nivel'),
+                    ->label('Nivel')
+                    ->sortable(),
 
                 TextColumn::make('word_count')
                     ->label('Palabras')
-                    ->numeric(),
+                    ->numeric()
+                    ->sortable(),
             ])
             ->headerActions([
                 CreateAction::make(),

@@ -22,7 +22,8 @@ class BookEventsTable
 
                 TextColumn::make('event_type')
                     ->label('Tipo')
-                    ->badge(),
+                    ->badge()
+                    ->sortable(),
 
                 TextColumn::make('event_date')
                     ->label('Fecha')
@@ -31,18 +32,22 @@ class BookEventsTable
 
                 TextColumn::make('location_name')
                     ->label('Lugar')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
 
                 TextColumn::make('total_copies_sold')
-                    ->label('Copias Vendidas'),
+                    ->label('Copias Vendidas')
+                    ->sortable(),
 
                 TextColumn::make('total_income')
                     ->label('Ingresos')
-                    ->money('EUR'),
+                    ->money('EUR')
+                    ->sortable(),
 
                 TextColumn::make('status')
                     ->label('Estado')
                     ->badge()
+                    ->sortable()
                     ->color(fn (?string $state): string => match ($state) {
                         'planned' => 'gray',
                         'confirmed' => 'warning',

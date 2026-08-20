@@ -20,10 +20,10 @@ class SourcesRelationManager extends RelationManager
     {
         return $table
             ->columns([
-                TextColumn::make('title')->label('Fuente')->searchable(),
-                TextColumn::make('source_type')->label('Tipo')->badge(),
-                TextColumn::make('author')->label('Autor'),
-                TextColumn::make('year')->label('Año'),
+                TextColumn::make('title')->label('Fuente')->searchable()->sortable(),
+                TextColumn::make('source_type')->label('Tipo')->badge()->sortable(),
+                TextColumn::make('author')->label('Autor')->sortable(),
+                TextColumn::make('year')->label('Año')->sortable(),
             ])
             ->headerActions([
                 Action::make('create')

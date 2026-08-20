@@ -23,17 +23,20 @@ class PromptsTable
 
                 TextColumn::make('work.title_public')
                     ->label('Obra')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
 
                 TextColumn::make('aiTool.name')
                     ->label('Herramienta IA')
                     ->searchable()
-                    ->badge(),
+                    ->badge()
+                    ->sortable(),
 
                 TextColumn::make('task.task_type')
                     ->label('Tarea')
                     ->searchable()
-                    ->placeholder('N/A'),
+                    ->placeholder('N/A')
+                    ->sortable(),
 
                 TextColumn::make('rating')
                     ->label('Rating')
@@ -42,7 +45,8 @@ class PromptsTable
                 TextColumn::make('purpose')
                     ->label('Propósito')
                     ->searchable()
-                    ->limit(30),
+                    ->limit(30)
+                    ->sortable(),
 
                 TextColumn::make('created_at')
                     ->label('Creado')

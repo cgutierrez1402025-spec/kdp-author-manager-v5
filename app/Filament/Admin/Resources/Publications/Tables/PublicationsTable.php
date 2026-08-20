@@ -24,6 +24,7 @@ class PublicationsTable
                 TextColumn::make('format')
                     ->label('Formato')
                     ->badge()
+                    ->sortable()
                     ->color(fn (?string $state): string => match ($state) {
                         'paperback' => 'primary',
                         'hardcover' => 'success',
@@ -35,20 +36,24 @@ class PublicationsTable
                 TextColumn::make('platform.name')
                     ->label('Plataforma')
                     ->searchable()
+                    ->sortable()
                     ->toggleable(),
 
                 TextColumn::make('marketplace.name')
                     ->label('Marketplace')
                     ->searchable()
+                    ->sortable()
                     ->toggleable(),
 
                 TextColumn::make('price')
                     ->label('Precio')
-                    ->money(),
+                    ->money()
+                    ->sortable(),
 
                 TextColumn::make('status')
                     ->label('Estado')
                     ->badge()
+                    ->sortable()
                     ->formatStateUsing(fn (?string $state): string => match ($state) {
                         'draft' => 'Borrador', 'processing' => 'Procesando', 'published' => 'Publicada', 'error' => 'Error', default => ucfirst((string) $state),
                     })

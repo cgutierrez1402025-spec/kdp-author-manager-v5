@@ -37,6 +37,9 @@ class DashboardDemoDataTest extends TestCase
         Livewire::test(MyTasksWidget::class)->assertSee('Revisar traducción inglesa');
         Livewire::test(UpcomingEventsWidget::class)->assertSee('Presentación y firma demo');
         Livewire::test(TopWorksByRevenueWidget::class)->assertSee('Obra de demostración 20');
+        Livewire::test(KdpImportedDataWidget::class)
+            ->assertSee('Regalías acumuladas por obra')
+            ->assertSee('Obra de demostración 01');
         Livewire::test(ExpiringKdpSelectWidget::class)
             ->assertSee('Obra de demostración 01')
             ->assertSee('20 días');

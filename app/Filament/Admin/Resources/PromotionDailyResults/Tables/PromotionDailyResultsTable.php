@@ -18,7 +18,8 @@ class PromotionDailyResultsTable
                 TextColumn::make('bookPromotion.promotion_name')
                     ->label('Promoción')
                     ->searchable()
-                    ->limit(30),
+                    ->limit(30)
+                    ->sortable(),
 
                 TextColumn::make('date')
                     ->label('Fecha')

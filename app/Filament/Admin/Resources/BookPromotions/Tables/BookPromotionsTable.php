@@ -29,6 +29,7 @@ class BookPromotionsTable
                 TextColumn::make('promotion_type')
                     ->label('Tipo')
                     ->badge()
+                    ->sortable()
                     ->color(fn (?string $state): string => match ($state) {
                         'free' => 'success',
                         'kindle_countdown' => 'warning',
@@ -39,7 +40,8 @@ class BookPromotionsTable
                 TextColumn::make('promotion_name')
                     ->label('Nombre')
                     ->searchable()
-                    ->limit(30),
+                    ->limit(30)
+                    ->sortable(),
 
                 TextColumn::make('start_date')
                     ->label('Inicio')
@@ -54,6 +56,7 @@ class BookPromotionsTable
                 TextColumn::make('status')
                     ->label('Estado')
                     ->badge()
+                    ->sortable()
                     ->color(fn (?string $state): string => match ($state) {
                         'planned' => 'gray',
                         'active' => 'warning',

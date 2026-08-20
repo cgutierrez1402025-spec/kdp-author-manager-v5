@@ -5,6 +5,7 @@ namespace App\Filament\Admin\Widgets;
 use App\Models\BookPromotion;
 use App\Models\Publication;
 use App\Models\RoyaltyEntry;
+use App\Models\KdpReportRow;
 use App\Models\Work;
 use Filament\Widgets\Widget;
 use Illuminate\Support\Facades\Cache;
@@ -43,9 +44,28 @@ class SummaryCardsWidget extends Widget
                 ->where('year', $previousMonth->year)
                 ->sum('total_royalty');
 
+            $revenuePeriod = sprintf('%04d-%02d', $currentYear, $currentMonth);
+            if ((float) $monthlyRevenue === 0.0) {
+                $latestKdpPeriod = KdpReportRow::query()
+                    ->where('row_kind', 'royalty')
+                    ->whereNotNull('report_period')
+                    ->when(! $user->canViewAllAuthorData(), fn ($query) => $query->where('user_id', $user->getKey()))
+                    ->max('report_period');
+
+                if ($latestKdpPeriod) {
+                    $monthlyRevenue = KdpReportRow::query()
+                        ->where('row_kind', 'royalty')
+                        ->whereDate('report_period', $latestKdpPeriod)
+                        ->when(! $user->canViewAllAuthorData(), fn ($query) => $query->where('user_id', $user->getKey()))
+                        ->sum('total_earnings');
+                    $revenuePeriod = (string) $latestKdpPeriod;
+                }
+            }
+
             return [
                 'total_works' => $works->count(),
                 'monthly_revenue' => $monthlyRevenue,
+                'revenue_period' => $revenuePeriod,
                 'active_publications' => $publications->where('status', 'published')->count(),
                 'active_promotions' => $promotions->active()->count(),
                 'revenue_change' => $previousRevenue > 0

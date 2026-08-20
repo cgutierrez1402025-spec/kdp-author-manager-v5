@@ -33,7 +33,8 @@ class MarketplacesTable
 
                 TextColumn::make('currency')
                     ->label('Moneda')
-                    ->badge(),
+                    ->badge()
+                    ->sortable(),
 
                 TextColumn::make('created_at')
                     ->label('Creado')

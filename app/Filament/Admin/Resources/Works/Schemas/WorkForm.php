@@ -6,6 +6,9 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
+use App\Models\Language;
+use App\Models\Genre;
+use App\Models\Subgenre;
 use Illuminate\Support\Str;
 
 class WorkForm
@@ -40,8 +43,8 @@ class WorkForm
                             ->maxLength(255),
 
                         Forms\Components\TextInput::make('slug')
-                            ->label('Slug')
-                            ->helperText('Se genera automáticamente y puede ajustarse antes de guardar.')
+                            ->label('Identificador URL (slug)')
+                            ->helperText('Texto corto y único que identifica la obra en una URL. Se genera automáticamente a partir del título.')
                             ->unique(ignoreRecord: true)
                             ->minLength(3)
                             ->maxLength(255),
@@ -58,12 +61,14 @@ class WorkForm
 
                         Forms\Components\TextInput::make('title_internal')
                             ->label('Título Interno')
+                            ->helperText('Nombre de trabajo usado dentro del equipo editorial; no tiene por qué ser público.')
                             ->required()
                             ->minLength(3)
                             ->maxLength(255),
 
                         Forms\Components\TextInput::make('title_public')
                             ->label('Título Público')
+                            ->helperText('Título que verá el lector en catálogos y publicaciones.')
                             ->required()
                             ->minLength(3)
                             ->maxLength(255),
@@ -74,6 +79,7 @@ class WorkForm
 
                         Forms\Components\TextInput::make('author_name')
                             ->label('Nombre del Autor')
+                            ->helperText('Nombre del autor que aparecerá en la ficha editorial.')
                             ->required()
                             ->maxLength(255),
 
@@ -85,13 +91,34 @@ class WorkForm
 
                 Forms\Components\Section::make('Detalles de la Obra')
                     ->schema([
-                        Forms\Components\TextInput::make('genre')
-                            ->label('Género')
-                            ->maxLength(100),
+                        Forms\Components\Select::make('genres')
+                            ->label('Género principal')
+                            ->helperText('Categoría editorial principal de la obra. KDP permite seleccionar hasta tres categorías por publicación.')
+                            ->relationship('genres', 'name', modifyQueryUsing: fn ($query) => $query->where('is_active', true))
+                            ->multiple()
+                            ->maxItems(3)
+                            ->searchable()
+                            ->preload()
+                            ->createOptionForm([
+                                Forms\Components\TextInput::make('name')->label('Nombre del género')->required(),
+                                Forms\Components\TextInput::make('slug')->label('Identificador')->required(),
+                            ])
+                            ->nullable(),
 
-                        Forms\Components\TextInput::make('subgenre')
+                        Forms\Components\Select::make('subgenres')
                             ->label('Subgénero')
-                            ->maxLength(100),
+                            ->helperText('Clasificación más concreta dentro del género principal.')
+                            ->relationship('subgenres', 'name', modifyQueryUsing: fn ($query) => $query->where('is_active', true))
+                            ->multiple()
+                            ->maxItems(3)
+                            ->searchable()
+                            ->preload()
+                            ->createOptionForm([
+                                Forms\Components\Select::make('genre_id')->label('Género padre')->relationship('genre', 'name')->required(),
+                                Forms\Components\TextInput::make('name')->label('Nombre del subgénero')->required(),
+                                Forms\Components\TextInput::make('slug')->label('Identificador')->required(),
+                            ])
+                            ->nullable(),
 
                         Forms\Components\TextInput::make('work_type')
                             ->label('Tipo de Obra')
@@ -99,16 +126,9 @@ class WorkForm
 
                         Forms\Components\Select::make('original_language')
                             ->label('Idioma Original')
-                            ->options([
-                                'es' => 'Español',
-                                'en' => 'Inglés',
-                                'ca' => 'Valenciano / Catalán',
-                                'fr' => 'Francés',
-                                'de' => 'Alemán',
-                                'it' => 'Italiano',
-                                'pt' => 'Portugués',
-                            ])
+                            ->options(fn () => Language::query()->where('is_active', true)->orderBy('name')->pluck('name', 'code'))
                             ->searchable()
+                            ->helperText('Idioma principal en el que se creó la obra. Puedes añadir idiomas desde la tabla de idiomas.')
                             ->required(),
 
                         Forms\Components\Select::make('status')
@@ -121,6 +141,7 @@ class WorkForm
                                 'preparacion' => 'Preparación',
                                 'publicada' => 'Publicada',
                             ])
+                            ->helperText('Fase actual del trabajo editorial, desde la idea hasta su publicación.')
                             ->default('idea')
                             ->required(),
                     ])

@@ -16,19 +16,23 @@ class KdpMetadatasTable
             ->columns([
                 TextColumn::make('publication.work.title_public')
                     ->label('Obra')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
 
                 TextColumn::make('title')
                     ->label('Título')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
 
                 TextColumn::make('author')
                     ->label('Autor')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
 
                 TextColumn::make('series_name')
                     ->label('Serie')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
             ])
             ->actions([
                 EditAction::make(),

@@ -14,11 +14,13 @@ class ActivityLogsTable
             ->columns([
                 TextColumn::make('user.name')
                     ->label('Usuario')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
 
                 TextColumn::make('action')
                     ->label('Acción')
                     ->badge()
+                    ->sortable()
                     ->color(fn (?string $state): string => match ($state) {
                         'created' => 'success',
                         'updated' => 'warning',
@@ -28,11 +30,13 @@ class ActivityLogsTable
 
                 TextColumn::make('description')
                     ->label('Descripción')
-                    ->limit(50),
+                    ->limit(50)
+                    ->sortable(),
 
                 TextColumn::make('loggable_type')
                     ->label('Tipo')
-                    ->placeholder('N/A'),
+                    ->placeholder('N/A')
+                    ->sortable(),
 
                 TextColumn::make('created_at')
                     ->label('Fecha')

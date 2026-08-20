@@ -32,6 +32,7 @@ class ManuscriptVersionsTable
 
                 TextColumn::make('workLanguage.language_code')
                     ->label('Idioma')
+                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('parent_version_number')
@@ -43,6 +44,7 @@ class ManuscriptVersionsTable
                 TextColumn::make('status')
                     ->label('Estado')
                     ->badge()
+                    ->sortable()
                     ->formatStateUsing(fn (?string $state): string => match ($state) {
                         'draft' => 'Borrador', 'review' => 'Revisión', 'final' => 'Final', 'published' => 'Publicada', default => ucfirst((string) $state),
                     })
@@ -56,21 +58,26 @@ class ManuscriptVersionsTable
 
                 ToggleColumn::make('is_candidate')
                     ->label('Candidata')
+                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 ToggleColumn::make('is_final')
-                    ->label('Final'),
+                    ->label('Final')
+                    ->sortable(),
 
                 ToggleColumn::make('is_published')
-                    ->label('Publicada'),
+                    ->label('Publicada')
+                    ->sortable(),
 
                 TextColumn::make('word_count')
                     ->label('Palabras')
-                    ->numeric(),
+                    ->numeric()
+                    ->sortable(),
 
                 TextColumn::make('chapter_count')
                     ->label('Capítulos')
-                    ->numeric(),
+                    ->numeric()
+                    ->sortable(),
 
                 TextColumn::make('created_at')
                     ->label('Creado')

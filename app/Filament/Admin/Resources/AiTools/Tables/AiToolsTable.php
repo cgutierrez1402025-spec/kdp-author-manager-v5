@@ -24,6 +24,7 @@ class AiToolsTable
 
                 TextColumn::make('provider')
                     ->label('Proveedor')
+                    ->sortable()
                     ->badge()
                     ->color(fn (?string $state): string => match ($state) {
                         'openai' => 'success',
@@ -35,7 +36,8 @@ class AiToolsTable
 
                 TextColumn::make('model')
                     ->label('Modelo')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
 
                 RatingColumn::make('quality_score')
                     ->label('Calidad')
