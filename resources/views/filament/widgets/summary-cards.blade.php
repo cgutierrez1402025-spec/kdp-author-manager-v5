@@ -13,14 +13,19 @@
             <div>
                     <p class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ $card['label'] }}</p>
                 <p class="mt-2 text-3xl font-bold tracking-tight text-gray-950 dark:text-white">
-                    {{ $key === 'monthly_revenue' ? number_format($stats[$key], 2).' €' : number_format($stats[$key]) }}
+                    {{ $key === 'monthly_revenue' ? number_format($stats[$key], 2).' '.$stats['revenue_currency'] : number_format($stats[$key]) }}
                 </p>
+                @if($key === 'monthly_revenue' && count($stats['revenue_by_currency']) > 1)
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                        {{ collect($stats['revenue_by_currency'])->map(fn ($amount, $currency) => number_format($amount, 2).' '.$currency)->implode(' · ') }}
+                    </p>
+                @endif
                 @if($key === 'monthly_revenue' && $stats['revenue_change'] !== null)
                     <p class="mt-1 text-xs font-medium {{ $stats['revenue_change'] >= 0 ? 'text-success-600' : 'text-danger-600' }}">
                         {{ $stats['revenue_change'] >= 0 ? '↑' : '↓' }} {{ number_format(abs($stats['revenue_change']), 1) }}% frente al mes anterior
                     </p>
                 @else
-                    <p class="mt-1 text-xs text-gray-400">{{ $key === 'monthly_revenue' ? 'Periodo '.$stats['revenue_period'] : 'Abrir detalle →' }}</p>
+                    <p class="mt-1 text-xs text-gray-400">{{ $key === 'monthly_revenue' ? 'Periodo '.\Illuminate\Support\Carbon::parse($stats['revenue_period'])->format('m/Y').' · '.($stats['revenue_source'] === 'kdp_report_rows' ? 'Informes KDP' : 'Regalías registradas') : 'Abrir detalle →' }}</p>
                 @endif
             </div>
             <span class="rounded-xl p-3 {{ $card['color'] }}">

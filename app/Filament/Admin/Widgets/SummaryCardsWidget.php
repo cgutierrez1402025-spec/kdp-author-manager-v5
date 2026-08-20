@@ -45,6 +45,8 @@ class SummaryCardsWidget extends Widget
                 ->sum('total_royalty');
 
             $revenuePeriod = sprintf('%04d-%02d', $currentYear, $currentMonth);
+            $revenueByCurrency = [];
+            $revenueSource = 'royalty_entries';
             if ((float) $monthlyRevenue === 0.0) {
                 $latestKdpPeriod = KdpReportRow::query()
                     ->where('row_kind', 'royalty')
@@ -53,18 +55,29 @@ class SummaryCardsWidget extends Widget
                     ->max('report_period');
 
                 if ($latestKdpPeriod) {
-                    $monthlyRevenue = KdpReportRow::query()
+                    $revenueByCurrency = KdpReportRow::query()
                         ->where('row_kind', 'royalty')
-                        ->whereDate('report_period', $latestKdpPeriod)
+                        ->where('report_period', $latestKdpPeriod)
                         ->when(! $user->canViewAllAuthorData(), fn ($query) => $query->where('user_id', $user->getKey()))
-                        ->sum('total_earnings');
+                        ->whereNotNull('currency')
+                        ->selectRaw('currency, SUM(COALESCE(total_earnings, 0)) AS total')
+                        ->groupBy('currency')
+                        ->havingRaw('SUM(COALESCE(total_earnings, 0)) <> 0')
+                        ->pluck('total', 'currency')
+                        ->map(fn ($total): float => (float) $total)
+                        ->all();
+                    $monthlyRevenue = $revenueByCurrency['EUR'] ?? (reset($revenueByCurrency) ?: 0);
                     $revenuePeriod = (string) $latestKdpPeriod;
+                    $revenueSource = 'kdp_report_rows';
                 }
             }
 
             return [
                 'total_works' => $works->count(),
                 'monthly_revenue' => $monthlyRevenue,
+                'revenue_by_currency' => $revenueByCurrency,
+                'revenue_currency' => array_key_exists('EUR', $revenueByCurrency) ? 'EUR' : (array_key_first($revenueByCurrency) ?? 'EUR'),
+                'revenue_source' => $revenueSource,
                 'revenue_period' => $revenuePeriod,
                 'active_publications' => $publications->where('status', 'published')->count(),
                 'active_promotions' => $promotions->active()->count(),

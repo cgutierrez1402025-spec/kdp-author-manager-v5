@@ -119,6 +119,6 @@ class KdpImportedDataWidget extends Widget
     private function rowsQuery(): Builder
     {
         return KdpReportRow::query()
-            ->when(! auth()->user()->canViewAllAuthorData(), fn (Builder $query) => $query->where('user_id', auth()->id()));
+            ->when(! auth()->user()->canViewAllAuthorData(), fn (Builder $query) => $query->where('kdp_report_rows.user_id', auth()->id()));
     }
 }

@@ -86,7 +86,7 @@ class KdpReportImportService
             });
 
             $batch->update($counters + ['status' => 'completed', 'finished_at' => now()]);
-            User::query()->pluck('id')->each(fn ($userId) => Cache::forget('dashboard:user:'.$userId.':summary'));
+            $this->invalidateDashboardCaches();
         } catch (Throwable $exception) {
             $batch->update(['status' => 'failed', 'finished_at' => now(), 'notes' => $exception->getMessage()]);
             throw $exception;
@@ -104,7 +104,7 @@ class KdpReportImportService
         $paymentIds = KdpPaymentAllocation::whereIn('kdp_report_row_id', $reportRowIds)->pluck('kdp_payment_id')->unique();
 
         try {
-            return DB::transaction(function () use ($batch, $catalogItemIds, $paymentIds): ImportBatch {
+            $result = DB::transaction(function () use ($batch, $catalogItemIds, $paymentIds): ImportBatch {
                 $lockedBatch = ImportBatch::whereKey($batch->id)->lockForUpdate()->firstOrFail();
                 $path = Storage::disk('local')->path($lockedBatch->original_file_path);
                 if (! is_file($path) || hash_file('sha256', $path) !== $lockedBatch->file_hash) {
@@ -131,10 +131,23 @@ class KdpReportImportService
 
                 return $result;
             });
+
+            $this->invalidateDashboardCaches();
+
+            return $result;
         } catch (Throwable $exception) {
             $batch->refresh()->update(['notes' => 'Reprocesado fallido; se conservaron los datos anteriores. '.$exception->getMessage()]);
             throw $exception;
         }
+    }
+
+    private function invalidateDashboardCaches(): void
+    {
+        User::query()->pluck('id')->each(function ($userId): void {
+            foreach (['summary', 'revenue-chart'] as $widget) {
+                Cache::forget('dashboard:user:'.$userId.':'.$widget);
+            }
+        });
     }
 
     /** @param array<int, int> $catalogItemIds
