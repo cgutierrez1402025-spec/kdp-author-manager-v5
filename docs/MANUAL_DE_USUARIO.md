@@ -1,90 +1,258 @@
-# Manual de usuario
+# Manual ilustrado de KDP Author Manager
 
-## Acceso y perfiles
+Este manual explica todas las opciones del panel. Las capturas proceden de la aplicación real con datos de demostración y perfil administrador. Las opciones visibles pueden reducirse según el rol.
 
-La aplicación se abre en `/admin`. Los perfiles disponibles son administrador, autor, editor y contable. Un autor solo ve sus obras y datos asociados; administrador, editor y contable pueden consultar datos de todos los autores según las políticas configuradas.
+## 1. Acceso y navegación
 
-En desarrollo existen dos usuarios demostrativos:
+Abra `/admin` e identifíquese. En desarrollo puede usar `admin@kdpmanager.local` o `author@example.com`, con contraseña `password`. Sustituya estas credenciales en producción.
 
-- `admin@kdpmanager.local` / `password`;
-- `author@example.com` / `password`.
+El administrador consulta todos los autores; el autor sólo sus propios datos. Editor y contable acceden según las políticas configuradas. La barra lateral agrupa las opciones por dominio, el buscador superior localiza recursos y el avatar permite cerrar sesión.
 
-Estas credenciales no deben mantenerse en producción.
+## 2. Inicio — Resumen editorial
 
-## Panel de inicio
+![Resumen editorial](images/manual/inicio.png)
 
-El panel resume la actividad editorial y comercial:
+El inicio reúne obras, publicaciones, regalías, tareas, eventos, promociones y datos importados. Las regalías identificadas como **Informes KDP** proceden de `kdp_report_rows`; si existen entradas manuales, la gráfica usa `royalty_entries`. Las monedas se presentan por separado.
 
-- obras, publicaciones y promociones activas;
-- ingresos mensuales registrados en la tabla histórica de regalías;
-- tareas propias y vencidas;
-- próximos eventos;
-- evolución de ingresos y obras principales;
-- promociones y su ROI;
-- vencimientos de KDP Select;
-- gráficos derivados de informes Amazon KDP importados.
+Revise aquí el último periodo, la evolución de ingresos, unidades, KENP, ASIN, títulos y marketplaces. Una importación o reprocesamiento invalida automáticamente la caché del panel.
 
-El bloque **Rendimiento importado desde Amazon KDP** muestra:
+## 3. Catálogo editorial
 
-- unidades netas y ASIN distintos;
-- páginas KENP;
-- evolución diaria de unidades;
-- títulos y marketplaces con más unidades;
-- KENP por título;
-- regalías agrupadas por moneda.
+### Obras
 
-El panel muestra únicamente títulos, mercados, fechas y monedas con un valor agregado distinto de cero. **Obras con más ingresos** incluye todas las obras con ingresos positivos, ordenadas de mayor a menor. El enlace **Ver desglose completo** abre todas las filas importadas: primero las que contienen alguna métrica distinta de cero y, a continuación, las que todavía no tienen actividad. El desglose permite filtrar por informe y tipo de dato y acceder a la publicación relacionada.
+![Listado de obras](images/manual/obras.png)
 
-Las monedas no se suman entre sí. Un total de EUR y otro de USD aparecen separados hasta que exista una tabla de tipos de cambio.
+La obra es la entidad principal. Puede buscar, filtrar, abrir y editar sus idiomas, manuscritos, publicaciones, tareas y fuentes. Orden recomendado: obra → idioma → manuscrito final → publicación.
 
-## Catálogo editorial
+### Crear una obra
 
-Una obra es la entidad principal. Desde ella se gestionan:
+![Formulario de nueva obra](images/manual/obra-nueva.png)
 
-- título público e interno, autor, idioma, género, audiencia y estado;
-- idiomas y traducciones;
-- versiones del manuscrito y capítulos;
-- publicaciones por plataforma, formato y marketplace;
-- fuentes documentales, tareas y prompts.
+Complete título público, autor, idioma original y estado. Añada género, audiencia, descripción y fechas cuando estén confirmados. Al guardar se asignan usuario e idioma original. No invente ASIN, ISBN ni fechas.
 
-El orden recomendado es: crear obra, idioma, versión de manuscrito y finalmente publicación. Para que una fila KDP se vincule automáticamente, la publicación debe tener el ASIN y formato correspondientes.
+### Versiones de manuscrito
 
-## Publicaciones y KDP
+![Versiones de manuscrito](images/manual/manuscritos.png)
 
-Una publicación identifica una edición comercial en una plataforma. Puede contener ASIN, ISBN, formato, precio, moneda, marketplace, URL y estado. Los metadatos KDP se conservan como preparación y referencia; la aplicación no publica ni modifica directamente una cuenta KDP mediante una API privada.
+Cada versión pertenece a una obra y un idioma. Registre número, estado, contenido, archivo privado, versión padre y cambios. Sólo un manuscrito final coherente puede asociarse a una publicación.
 
-Los periodos KDP Select permiten registrar inicio, fin, renovación y días de promoción gratuita utilizados. El panel avisa de vencimientos próximos.
+### Tareas
 
-## Importación KDP
+![Listado de tareas](images/manual/tareas.png)
 
-1. En KDP Reports, aplica los filtros deseados y descarga el informe.
-2. En la aplicación, abre **Publicaciones → Importar informes KDP**.
-3. Pulsa **Cargar informe KDP**, selecciona hasta 20 CSV/XLSX simultáneamente o un ZIP y deja activada la detección automática.
-4. Indica un periodo sólo como respaldo si los nombres no lo contienen.
-5. Guarda y espera la notificación de resultado.
-6. Consulta **Sesiones de importación** para revisar archivos completados, duplicados y fallidos, y abre sus lotes si necesitas reprocesarlos.
-7. Regresa al panel para ver los gráficos actualizados.
+Una tarea puede ser general de una obra o específica de una publicación. Indique responsable, tipo, prioridad, estado y vencimiento. La acción **Nueva tarea** de una publicación precarga ambos vínculos y rechaza combinaciones incoherentes.
 
-Cada título nuevo aparece automáticamente en **Publicaciones → Catálogo detectado KDP** y se crea como obra/publicación provisional. `Vinculada` significa que las filas comerciales ya apuntan al catálogo editorial. La obra queda **Pendiente de completar (KDP)** hasta que se añadan idioma, clasificación y, cuando exista, manuscrito.
+### Tipos de tarea
 
-Si la agrupación automática no corresponde a la obra adecuada, utiliza las acciones del catálogo para revisar el vínculo. No se genera un idioma ni manuscrito artificial: deben completarse posteriormente desde la obra o edición publicada.
+![Tipos de tarea](images/manual/tipos-tarea.png)
 
-La acción **Reprocesar** elimina únicamente las filas derivadas de ese lote y vuelve a crearlas desde el archivo original privado. Es útil después de actualizar reglas de mapeo. No elimina el archivo original.
+Autores, editores y administradores pueden crear tipos compartidos. Pulse **Nuevo tipo** o créelo desde el selector de una tarea. El nombre debe ser único. Desactive tipos obsoletos; las tareas existentes conservarán su relación.
 
-También puedes usar **Reprocesar sesión** para repetir todos los archivos de una carga. La aplicación valida la huella del archivo y conserva los datos anteriores de cualquier fichero que falle; no elimina obras ni vínculos confirmados por el usuario.
+### Listas de verificación
 
-Consulte [IMPORTACION_AMAZON_KDP.md](IMPORTACION_AMAZON_KDP.md) para formatos, controles y resolución de incidencias.
+![Listas de verificación](images/manual/checklists.png)
 
-## Regalías, pagos y promociones
+Una checklist puede aplicarse a toda una obra o a una publicación concreta. Déjela sin publicación para controles reutilizables. Gestione las comprobaciones desde la pestaña **Elementos**.
 
-Las regalías históricas manuales y las filas importadas KDP son fuentes distintas. Los widgets antiguos usan `royalty_entries`; el nuevo bloque KDP usa `kdp_report_rows`. Esta separación evita alterar datos históricos hasta que exista una conciliación explícita.
+## 4. Publicaciones
 
-Una promoción agrupa periodo, precio, objetivo, costes y resultados diarios. El ROI mostrado es una ayuda analítica y depende de que costes e ingresos estén completos y expresados en una moneda comparable.
+### Ediciones publicadas
 
-## Tareas, eventos y documentación
+![Ediciones publicadas](images/manual/publicaciones.png)
 
-Las tareas se vinculan a una obra y tienen responsable, prioridad, estado y vencimiento. Los eventos registran presentaciones u otras actividades, ejemplares vendidos e ingresos. Las fuentes y usos documentan procedencia, derechos, fiabilidad y fragmentos utilizados en manuscritos.
+Una publicación relaciona obra, idioma, manuscrito final, plataforma, marketplace y formato. Puede contener ASIN, ISBN, precio, moneda, URL, estado y fecha. Desde el listado puede editarla o crear tareas y checklists vinculadas.
 
-## Funciones de IA
+### Audiolibros
 
-La aplicación conserva herramientas, tareas y prompts de IA. El servicio disponible puede sugerir etiquetas, mejorar descripciones y traducir texto cuando existe una clave configurada. Todo resultado debe revisarse. No se deben enviar datos bancarios, credenciales, información personal innecesaria ni manuscritos confidenciales sin valorar las condiciones del proveedor.
+![Audiolibros](images/manual/audiolibros.png)
+
+Registra ediciones de audio, producción, narración, capítulos, activos, calidad, distribución, costes y regalías. No marque como publicable una edición sin derechos y activos aprobados.
+
+### Narradores y voces
+
+![Narradores y voces](images/manual/narradores.png)
+
+Registra narradores humanos, voces virtuales y réplicas autorizadas. Complete idiomas, características y consentimiento. La réplica de voz exige consentimiento vigente.
+
+### Metadatos KDP
+
+![Metadatos KDP](images/manual/metadatos-kdp.png)
+
+Conserva título, subtítulo, autor, descripción, palabras clave, categorías, edades, derechos y declaración de IA. Es una referencia de preparación; no modifica directamente la cuenta Amazon.
+
+### Periodos KDP Select
+
+![Periodos KDP Select](images/manual/periodos-kdp-select.png)
+
+Registre publicación, fechas, renovación, días gratuitos y estado. El panel avisa de vencimientos. Use fechas confirmadas en KDP, no inferidas desde ventas.
+
+### Plataformas
+
+![Plataformas](images/manual/plataformas.png)
+
+Define canales de distribución como Amazon KDP. Se utilizan al crear publicaciones y mercados. Evite duplicados ortográficos.
+
+### Marketplaces
+
+![Marketplaces](images/manual/marketplaces.png)
+
+Representa tiendas asociadas a una plataforma. Configure nombre, país, dominio y moneda. Una publicación sólo puede usar un mercado de su plataforma.
+
+## 5. Informes Amazon KDP
+
+### Importar informes KDP
+
+![Importación KDP](images/manual/importar-kdp.png)
+
+1. Descargue el CSV o XLSX desde KDP Reports.
+2. Seleccione hasta veinte archivos o un ZIP.
+3. Mantenga la detección automática.
+4. Indique un periodo sólo como respaldo.
+5. Guarde y revise el resultado.
+
+Los archivos son privados. Las huellas SHA-256 detectan duplicados y cada fila conserva valores originales y normalizados.
+
+### Sesiones de importación
+
+![Sesiones de importación](images/manual/sesiones-importacion.png)
+
+Una carga múltiple crea una sesión con archivos completados, duplicados y fallidos. Abra sus lotes o use **Reprocesar sesión** tras actualizar reglas. Si un fichero falla se conservan los datos anteriores.
+
+### Catálogo detectado KDP
+
+![Catálogo detectado KDP](images/manual/catalogo-kdp.png)
+
+Contiene títulos encontrados. La aplicación vincula por ASIN y formato o crea registros provisionales. Revise idioma, clasificación, manuscrito y obra. Use **Vincular a obra** si ya existe.
+
+### Desglose de informes
+
+![Desglose KDP](images/manual/desglose-kdp.png)
+
+Muestra filas normalizadas con informe, fecha, título, ASIN, mercado, unidades, KENP, importe y moneda. Filtre para investigar diferencias. Las filas sin actividad se conservan para auditoría.
+
+### Pagos KDP
+
+![Pagos KDP](images/manual/pagos-kdp.png)
+
+Incluye número, fecha de transferencia, método, periodo, mercado, moneda, neto, retención, cambio e importe. Un pago agregado permanece sin obra si Amazon no aporta una relación inequívoca.
+
+## 6. Marketing
+
+### Promociones
+
+![Promociones](images/manual/promociones.png)
+
+Registre publicación, mercado, tipo, fechas, precios, objetivo y estado. No solape periodos incompatibles. El ROI requiere costes e ingresos completos en moneda comparable.
+
+### Costes de promoción
+
+![Costes de promoción](images/manual/costes-promocion.png)
+
+Asocie fecha, concepto, proveedor, importe y moneda a una promoción. Registre gastos reales y conserve su trazabilidad.
+
+### Resultados diarios
+
+![Resultados diarios](images/manual/resultados-promocion.png)
+
+Registre ventas, ingresos, impresiones, clics y otras métricas por día. Identifique la fuente y evite duplicar datos importados.
+
+## 7. Eventos
+
+### Calendario de eventos
+
+![Calendario de eventos](images/manual/eventos.png)
+
+Registra presentaciones, firmas y ferias con fecha, lugar, estado y notas. Los próximos eventos aparecen en el inicio.
+
+### Libros en eventos
+
+![Libros en eventos](images/manual/libros-eventos.png)
+
+Relaciona obras con eventos y permite registrar ejemplares, ventas e ingresos. Sólo se ofrecen obras accesibles para el usuario.
+
+## 8. Documentación
+
+### Fuentes
+
+![Fuentes documentales](images/manual/fuentes.png)
+
+Registre título, autor, año, tipo, idioma, URL, cita, resumen, derechos, licencia y fiabilidad. Los archivos admitidos se guardan de forma privada.
+
+### Usos de fuente
+
+![Usos de fuente](images/manual/usos-fuente.png)
+
+Documenta cómo se utilizó una fuente en una obra: fragmento, finalidad, ubicación y observaciones. Facilita revisar derechos y atribuciones.
+
+### Ayuda integrada
+
+![Ayuda de la aplicación](images/manual/ayuda.png)
+
+Ofrece accesos rápidos a los flujos frecuentes. Para incidencias técnicas consulte `PRUEBAS_Y_RESOLUCION_DE_PROBLEMAS.md`.
+
+## 9. Inteligencia artificial
+
+### Prompts
+
+![Prompts](images/manual/prompts.png)
+
+Registre objetivo, instrucciones, obra, herramienta y versión. No incluya claves, datos bancarios ni información personal innecesaria.
+
+### Tareas IA
+
+![Tareas IA](images/manual/tareas-ia.png)
+
+Agrupa trabajos asistidos, entrada, resultado, estado y herramienta. Revise siempre el resultado antes de incorporarlo a una publicación.
+
+## 10. Ilustraciones
+
+### Anclajes de ilustraciones
+
+![Anclajes de ilustraciones](images/manual/anclajes-ilustraciones.png)
+
+Relaciona una ilustración con una obra y una ubicación editorial. Conserva intención, posición y estado de aplicación entre versiones.
+
+## 11. Configuración editorial
+
+### Idiomas
+
+![Idiomas](images/manual/idiomas.png)
+
+Administra códigos, nombres y estado de los idiomas usados en obras, traducciones, manuscritos y audiolibros. Evite duplicados.
+
+## 12. Resolución rápida de problemas
+
+### Resumen o gráfica vacíos
+
+- Importe un informe de ventas/regalías, no sólo pagos.
+- Compruebe propietario, periodo y tipo de fila en **Desglose**.
+- Revise errores en **Sesiones de importación**.
+- Tras desplegar una versión ejecute `php artisan optimize:clear`.
+
+### Archivo duplicado
+
+La huella coincide con una carga previa. Abra el lote anterior o use **Reprocesar**; no renombre el mismo archivo para forzarlo.
+
+### Publicación sin vínculo
+
+Revise ASIN, formato y propietario. Complete el vínculo desde **Catálogo detectado KDP**.
+
+### Opción no visible
+
+Puede estar restringida por rol. Solicite al administrador revisar permisos.
+
+## 13. Regenerar las capturas
+
+Con la aplicación disponible en el puerto 8030:
+
+```bash
+MANUAL_BASE_URL=http://127.0.0.1:8030 node scripts/capture-user-manual.mjs
+```
+
+Para una sola pantalla:
+
+```bash
+MANUAL_PAGE=obras node scripts/capture-user-manual.mjs
+```
+
+El script usa Google Chrome headless y guarda las imágenes en `docs/images/manual`.

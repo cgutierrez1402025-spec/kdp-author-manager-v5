@@ -2,7 +2,7 @@
 
 ## Documentos vigentes
 
-- [`MANUAL_DE_USUARIO.md`](MANUAL_DE_USUARIO.md): funcionamiento completo para autores y administradores.
+- [`MANUAL_DE_USUARIO.md`](MANUAL_DE_USUARIO.md): manual ilustrado de todas las opciones para autores y administradores.
 - [`IMPORTACION_AMAZON_KDP.md`](IMPORTACION_AMAZON_KDP.md): formatos, normalización, duplicados y reprocesado.
 - [`ARQUITECTURA_Y_MODELO_DE_DATOS.md`](ARQUITECTURA_Y_MODELO_DE_DATOS.md): componentes, dominios y fuentes del panel.
 - [`OPERACION_DESPLIEGUE_Y_MANTENIMIENTO.md`](OPERACION_DESPLIEGUE_Y_MANTENIMIENTO.md): instalación, despliegue, almacenamiento y copias.
