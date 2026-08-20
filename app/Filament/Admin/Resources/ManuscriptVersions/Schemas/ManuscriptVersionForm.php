@@ -2,10 +2,10 @@
 
 namespace App\Filament\Admin\Resources\ManuscriptVersions\Schemas;
 
-use Filament\Forms;
-use Filament\Forms\Form;
 use App\Models\Language;
+use Filament\Forms;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Form;
 
 class ManuscriptVersionForm
 {
@@ -97,7 +97,16 @@ class ManuscriptVersionForm
                             ->helperText('Selecciona o sube el fichero del manuscrito. La aplicación guardará la ruta relativa dentro del almacenamiento configurado.')
                             ->disk('local')
                             ->directory('manuscripts')
-                            ->preserveFilenames()
+                            ->visibility('private')
+                            ->acceptedFileTypes([
+                                'application/pdf',
+                                'text/plain',
+                                'text/markdown',
+                                'application/epub+zip',
+                                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                                'application/vnd.oasis.opendocument.text',
+                            ])
+                            ->maxSize(51200)
                             ->downloadable()
                             ->openable(),
                     ]),

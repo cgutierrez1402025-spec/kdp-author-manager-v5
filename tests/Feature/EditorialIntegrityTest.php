@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\ManuscriptVersion;
 use App\Models\Marketplace;
 use App\Models\Platform;
+use App\Models\Publication;
 use App\Models\User;
 use App\Models\Work;
 use App\Models\WorkLanguage;
@@ -100,6 +101,24 @@ class EditorialIntegrityTest extends TestCase
             $this->fail('Expected marketplace integrity validation to fail.');
         } catch (ValidationException $exception) {
             $this->assertArrayHasKey('marketplace_id', $exception->errors());
+        }
+    }
+
+    public function test_task_publication_must_belong_to_the_selected_work(): void
+    {
+        $author = User::factory()->create();
+        $work = Work::factory()->create(['user_id' => $author->id]);
+        $otherPublication = Publication::factory()->create();
+
+        try {
+            app(EditorialIntegrityService::class)->validateTask([
+                'work_id' => $work->id,
+                'publication_id' => $otherPublication->id,
+            ], $author);
+
+            $this->fail('Expected task integrity validation to fail.');
+        } catch (ValidationException $exception) {
+            $this->assertArrayHasKey('publication_id', $exception->errors());
         }
     }
 }

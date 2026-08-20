@@ -76,8 +76,16 @@ class SourceForm
                     ->schema([
                         Forms\Components\FileUpload::make('file_path')
                             ->label('Archivo')
+                            ->disk('local')
                             ->directory('sources')
                             ->visibility('private')
+                            ->acceptedFileTypes([
+                                'application/pdf',
+                                'text/plain',
+                                'text/markdown',
+                                'application/epub+zip',
+                                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                            ])
                             ->maxSize(10240),
                     ]),
 

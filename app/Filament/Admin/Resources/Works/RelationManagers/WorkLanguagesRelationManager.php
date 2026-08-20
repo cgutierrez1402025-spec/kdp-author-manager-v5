@@ -16,7 +16,9 @@ use Filament\Tables\Table;
 class WorkLanguagesRelationManager extends RelationManager
 {
     protected static string $relationship = 'workLanguages';
+
     protected static ?string $title = 'Idiomas de la obra';
+
     protected static ?string $recordTitleAttribute = 'language_code';
 
     public function form(Form $form): Form

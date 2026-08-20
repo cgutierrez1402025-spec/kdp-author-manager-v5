@@ -3,6 +3,8 @@
 namespace App\Filament\Admin\Resources\Tasks\Pages;
 
 use App\Filament\Admin\Resources\Tasks\TaskResource;
+use App\Filament\Admin\Resources\Works\WorkResource;
+use App\Services\EditorialIntegrityService;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateTask extends CreateRecord
@@ -13,8 +15,8 @@ class CreateTask extends CreateRecord
     {
         $workId = request()->integer('work_id');
 
-        if ($workId && TaskResource::getEloquentQuery()->whereKey($workId)->exists()) {
-            $this->form->fill([...$this->form->getState(), 'work_id' => $workId]);
+        if ($workId > 0 && WorkResource::getEloquentQuery()->whereKey($workId)->exists()) {
+            $this->form->fill([...$this->form->getRawState(), 'work_id' => $workId]);
         }
     }
 
@@ -22,6 +24,6 @@ class CreateTask extends CreateRecord
     {
         $data['created_by'] = auth()->id();
 
-        return $data;
+        return app(EditorialIntegrityService::class)->validateTask($data, auth()->user());
     }
 }

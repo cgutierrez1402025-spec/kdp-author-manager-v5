@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources\Sources\Pages;
 
 use App\Filament\Admin\Resources\Sources\SourceResource;
+use App\Filament\Admin\Resources\Works\WorkResource;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateSource extends CreateRecord
@@ -13,8 +14,8 @@ class CreateSource extends CreateRecord
     {
         $workId = request()->integer('work_id');
 
-        if ($workId && SourceResource::getEloquentQuery()->whereKey($workId)->exists()) {
-            $this->form->fill([...$this->form->getState(), 'work_id' => $workId]);
+        if ($workId > 0 && WorkResource::getEloquentQuery()->whereKey($workId)->exists()) {
+            $this->form->fill([...$this->form->getRawState(), 'work_id' => $workId]);
         }
     }
 }

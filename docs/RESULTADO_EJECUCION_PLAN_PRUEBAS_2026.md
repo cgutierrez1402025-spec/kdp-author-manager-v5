@@ -1,14 +1,15 @@
 # Resultado de ejecución del plan de pruebas y correcciones
 
-Fecha: 19 de agosto de 2026.
+Fecha de última ejecución: 20 de agosto de 2026.
 
 ## Resultado general
 
-- 93 pruebas superadas y 632 aserciones correctas.
+- 96 pruebas superadas y 656 aserciones correctas.
 - PHPStan sin errores.
 - Pint sin desviaciones.
 - Build Vite de producción correcto.
-- 24 migraciones aplicadas.
+- Auditorías Composer y npm sin vulnerabilidades conocidas.
+- 28 migraciones aplicadas.
 - Base de datos, claves foráneas y almacenamiento correctos.
 - Cero sesiones KDP fallidas, lotes fallidos y trabajos de cola fallidos.
 - Interfaz disponible en `http://127.0.0.1:8020/admin/login`.
@@ -41,6 +42,22 @@ Se creó una copia aislada en `/private/tmp/kdp-v5-idempotency.sqlite`. Dos repr
 La base real conservó antes y después la huella SHA-256 `6e1dea8d74827d5ae1bfc498c23f45cf9f984f1860d27903111a9a01ae7d1bce`.
 
 ## Errores encontrados y corregidos
+
+### Enlaces contextuales de tareas y fuentes
+
+Los formularios de creación comprobaban el parámetro `work_id` contra el recurso de tareas o fuentes, en lugar del recurso de obras. Ahora validan la obra dentro de la consulta autorizada y preservan el estado del formulario sin disparar validaciones prematuras. Una prueba de regresión confirma que un autor sólo puede precargar una obra propia.
+
+### Coherencia entre tareas y publicaciones
+
+La selección del formulario filtraba las publicaciones por obra, pero una petición manipulada podía intentar guardar una publicación de otra obra. La misma restricción se aplica ahora en el servicio de integridad tanto al crear como al editar, con una prueba negativa.
+
+### Archivos editoriales privados
+
+Las fuentes y manuscritos limitan ahora los tipos MIME admitidos y su tamaño. Los manuscritos dejan de conservar el nombre original para evitar colisiones y ambos tipos de archivo declaran almacenamiento privado.
+
+### Calidad de código
+
+Se corrigieron las desviaciones detectadas por Pint en 15 archivos. PHPStan termina sin errores y el build de producción continúa siendo correcto.
 
 ### Estado obsoleto de una sesión
 

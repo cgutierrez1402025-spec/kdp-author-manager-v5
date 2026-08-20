@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Filament\Admin\Resources\ManuscriptVersions\Pages\EditManuscriptVersion;
 use App\Filament\Admin\Resources\ManuscriptVersions\RelationManagers\ChaptersRelationManager;
 use App\Filament\Admin\Resources\ManuscriptVersions\Widgets\VersionTreeWidget;
+use App\Filament\Admin\Resources\Tasks\Pages\CreateTask;
 use App\Filament\Admin\Resources\Works\Pages\ViewWork;
 use App\Filament\Admin\Resources\Works\RelationManagers\ManuscriptVersionsRelationManager;
 use App\Filament\Admin\Resources\Works\RelationManagers\PublicationsRelationManager;
@@ -126,6 +127,31 @@ class AdminResourcesSmokeTest extends TestCase
         $this->actingAs(User::factory()->create())
             ->get('/admin')
             ->assertForbidden();
+    }
+
+    public function test_author_can_prefill_only_an_owned_work_from_create_page_links(): void
+    {
+        $author = User::factory()->create();
+        $otherAuthor = User::factory()->create();
+        $role = Role::create(['name' => 'author', 'guard_name' => 'web']);
+        $author->roles()->attach($role);
+
+        $ownWork = Work::factory()->create(['user_id' => $author->id]);
+        $otherWork = Work::factory()->create(['user_id' => $otherAuthor->id]);
+
+        $this->actingAs($author);
+
+        request()->query->remove('work_id');
+        $component = Livewire::test(CreateTask::class);
+        request()->query->set('work_id', $ownWork->id);
+        (new \ReflectionMethod(CreateTask::class, 'afterFill'))->invoke($component->instance());
+        $component->assertFormSet(['work_id' => $ownWork->id]);
+
+        request()->query->remove('work_id');
+        $component = Livewire::test(CreateTask::class);
+        request()->query->set('work_id', $otherWork->id);
+        (new \ReflectionMethod(CreateTask::class, 'afterFill'))->invoke($component->instance());
+        $component->assertFormSet(['work_id' => null]);
     }
 
     public function test_chapters_relation_manager_can_be_rendered(): void

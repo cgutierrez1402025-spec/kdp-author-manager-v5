@@ -12,6 +12,7 @@ class Subgenre extends Model
     use HasFactory;
 
     protected $fillable = ['genre_id', 'name', 'slug', 'is_active'];
+
     protected $casts = ['is_active' => 'boolean'];
 
     public function genre(): BelongsTo

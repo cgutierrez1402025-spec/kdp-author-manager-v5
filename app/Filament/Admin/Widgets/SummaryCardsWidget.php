@@ -3,9 +3,9 @@
 namespace App\Filament\Admin\Widgets;
 
 use App\Models\BookPromotion;
+use App\Models\KdpReportRow;
 use App\Models\Publication;
 use App\Models\RoyaltyEntry;
-use App\Models\KdpReportRow;
 use App\Models\Work;
 use Filament\Widgets\Widget;
 use Illuminate\Support\Facades\Cache;

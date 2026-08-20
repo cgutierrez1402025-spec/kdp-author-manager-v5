@@ -3,25 +3,31 @@
 namespace App\Filament\Admin\Resources\Languages;
 
 use App\Models\Language;
-use Filament\Forms\Form;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Actions\CreateAction;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
 
 class LanguageResource extends Resource
 {
     protected static ?string $model = Language::class;
+
     protected static ?string $slug = 'languages';
+
     protected static ?string $navigationIcon = 'heroicon-o-language';
+
     protected static ?string $navigationLabel = 'Idiomas';
+
     protected static ?string $navigationGroup = 'Configuración editorial';
+
     protected static ?string $modelLabel = 'idioma';
+
     protected static ?string $pluralModelLabel = 'idiomas';
 
     public static function form(Form $form): Form
