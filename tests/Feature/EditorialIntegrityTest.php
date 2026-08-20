@@ -121,4 +121,22 @@ class EditorialIntegrityTest extends TestCase
             $this->assertArrayHasKey('publication_id', $exception->errors());
         }
     }
+
+    public function test_checklist_publication_must_belong_to_the_selected_work(): void
+    {
+        $author = User::factory()->create();
+        $work = Work::factory()->create(['user_id' => $author->id]);
+        $otherPublication = Publication::factory()->create();
+
+        try {
+            app(EditorialIntegrityService::class)->validateChecklist([
+                'work_id' => $work->id,
+                'publication_id' => $otherPublication->id,
+            ], $author);
+
+            $this->fail('Expected checklist integrity validation to fail.');
+        } catch (ValidationException $exception) {
+            $this->assertArrayHasKey('publication_id', $exception->errors());
+        }
+    }
 }

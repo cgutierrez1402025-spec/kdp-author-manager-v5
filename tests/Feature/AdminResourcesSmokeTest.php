@@ -12,6 +12,7 @@ use App\Filament\Admin\Resources\Works\RelationManagers\PublicationsRelationMana
 use App\Filament\Admin\Resources\Works\RelationManagers\SourcesRelationManager;
 use App\Filament\Admin\Resources\Works\RelationManagers\TasksRelationManager;
 use App\Models\ManuscriptVersion;
+use App\Models\Publication;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\Work;
@@ -51,6 +52,7 @@ class AdminResourcesSmokeTest extends TestCase
             '/admin/source-usages',
             '/admin/sources',
             '/admin/tasks',
+            '/admin/task-types',
             '/admin/works',
         ];
 
@@ -88,6 +90,7 @@ class AdminResourcesSmokeTest extends TestCase
             '/admin/source-usages/create',
             '/admin/sources/create',
             '/admin/tasks/create',
+            '/admin/task-types/create',
             '/admin/works/create',
         ];
 
@@ -152,6 +155,39 @@ class AdminResourcesSmokeTest extends TestCase
         request()->query->set('work_id', $otherWork->id);
         (new \ReflectionMethod(CreateTask::class, 'afterFill'))->invoke($component->instance());
         $component->assertFormSet(['work_id' => null]);
+    }
+
+    public function test_author_can_prefill_a_publication_task_only_when_it_belongs_to_the_work(): void
+    {
+        $author = User::factory()->create();
+        $role = Role::create(['name' => 'author', 'guard_name' => 'web']);
+        $author->roles()->attach($role);
+        $work = Work::factory()->create(['user_id' => $author->id]);
+        $publication = Publication::factory()->create(['work_id' => $work->id]);
+        $otherPublication = Publication::factory()->create(['work_id' => Work::factory()->create(['user_id' => $author->id])->id]);
+
+        $this->actingAs($author);
+        request()->query->remove('work_id');
+        request()->query->remove('publication_id');
+        $component = Livewire::test(CreateTask::class);
+        request()->query->set('work_id', $work->id);
+        request()->query->set('publication_id', $publication->id);
+        (new \ReflectionMethod(CreateTask::class, 'afterFill'))->invoke($component->instance());
+        $component->assertFormSet([
+            'work_id' => $work->id,
+            'publication_id' => $publication->id,
+        ]);
+
+        request()->query->remove('work_id');
+        request()->query->remove('publication_id');
+        $component = Livewire::test(CreateTask::class);
+        request()->query->set('work_id', $work->id);
+        request()->query->set('publication_id', $otherPublication->id);
+        (new \ReflectionMethod(CreateTask::class, 'afterFill'))->invoke($component->instance());
+        $component->assertFormSet([
+            'work_id' => $work->id,
+            'publication_id' => null,
+        ]);
     }
 
     public function test_chapters_relation_manager_can_be_rendered(): void

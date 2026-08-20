@@ -13,6 +13,7 @@ class Checklist extends Model
 
     protected $fillable = [
         'work_id',
+        'publication_id',
         'name',
         'description',
     ];
@@ -20,6 +21,11 @@ class Checklist extends Model
     public function work(): BelongsTo
     {
         return $this->belongsTo(Work::class);
+    }
+
+    public function publication(): BelongsTo
+    {
+        return $this->belongsTo(Publication::class);
     }
 
     public function items(): HasMany

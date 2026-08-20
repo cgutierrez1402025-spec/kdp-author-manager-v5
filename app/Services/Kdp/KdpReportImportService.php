@@ -390,6 +390,12 @@ class KdpReportImportService
         $row['payment_date'] = $this->date($row['payment_date'] ?? null);
         $row['transaction_date'] = $this->date($row['transaction_date'] ?? null);
 
+        // Amazon's Spanish XLSX payment report labels this column simply as
+        // "Fecha". It is unambiguous once the row has been classified as a payment.
+        if ($row['row_kind'] === 'payment' && empty($row['payment_date'])) {
+            $row['payment_date'] = $row['transaction_date'];
+        }
+
         return $row;
     }
 

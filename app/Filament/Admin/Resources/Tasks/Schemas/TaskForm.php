@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Tasks\Schemas;
 
+use App\Models\TaskType;
 use Filament\Forms;
 use Filament\Forms\Form;
 
@@ -62,9 +63,11 @@ class TaskForm
                             ->relationship('taskType', 'name', modifyQueryUsing: fn ($query) => $query->where('is_active', true))
                             ->label('Tipo de tarea')
                             ->createOptionForm([
-                                Forms\Components\TextInput::make('name')->label('Nombre')->required(),
+                                Forms\Components\TextInput::make('name')->label('Nombre')->required()->maxLength(100)->unique(TaskType::class, 'name'),
                                 Forms\Components\TextInput::make('description')->label('Descripción'),
                             ])
+                            ->createOptionUsing(fn (array $data): int => TaskType::create($data + ['is_active' => true])->getKey())
+                            ->createOptionAction(fn ($action) => $action->label('Añadir tipo de tarea')->modalHeading('Nuevo tipo de tarea'))
                             ->searchable()
                             ->preload()
                             ->nullable(),

@@ -2,6 +2,9 @@
 
 namespace App\Filament\Admin\Resources\Publications\Tables;
 
+use App\Filament\Admin\Resources\Checklists\ChecklistResource;
+use App\Filament\Admin\Resources\Tasks\TaskResource;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
@@ -97,6 +100,20 @@ class PublicationsTable
                     ]),
             ])
             ->actions([
+                Action::make('createTask')
+                    ->label('Nueva tarea')
+                    ->icon('heroicon-o-check-circle')
+                    ->url(fn ($record): string => TaskResource::getUrl('create', [
+                        'work_id' => $record->work_id,
+                        'publication_id' => $record->getKey(),
+                    ])),
+                Action::make('createChecklist')
+                    ->label('Nueva checklist')
+                    ->icon('heroicon-o-clipboard-document-check')
+                    ->url(fn ($record): string => ChecklistResource::getUrl('create', [
+                        'work_id' => $record->work_id,
+                        'publication_id' => $record->getKey(),
+                    ])),
                 EditAction::make(),
             ])
             ->bulkActions([

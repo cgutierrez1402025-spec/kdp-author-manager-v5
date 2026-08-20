@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\ImportBatch;
 use App\Models\ImportSession;
+use App\Services\Kdp\KdpBulkImportService;
 use App\Services\Kdp\KdpReportImportService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Auth;

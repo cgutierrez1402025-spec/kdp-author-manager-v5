@@ -24,6 +24,12 @@ class ChecklistsTable
                     ->searchable()
                     ->sortable(),
 
+                TextColumn::make('publication.asin')
+                    ->label('Publicación')
+                    ->placeholder('General de la obra')
+                    ->searchable()
+                    ->sortable(),
+
                 TextColumn::make('progress_percentage')
                     ->label('Progreso')
                     ->suffix('%')

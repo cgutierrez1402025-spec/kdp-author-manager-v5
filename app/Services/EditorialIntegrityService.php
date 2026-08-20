@@ -13,6 +13,26 @@ use Illuminate\Validation\ValidationException;
 
 class EditorialIntegrityService
 {
+    public function validateChecklist(array $data, User $user): array
+    {
+        $work = Work::findOrFail($data['work_id']);
+        $this->ensureWorkAccess($work, $user);
+
+        if (! empty($data['publication_id'])) {
+            $publicationMatches = Publication::whereKey($data['publication_id'])
+                ->where('work_id', $work->id)
+                ->exists();
+
+            if (! $publicationMatches) {
+                throw ValidationException::withMessages([
+                    'publication_id' => 'La publicación seleccionada no pertenece a la obra.',
+                ]);
+            }
+        }
+
+        return $data;
+    }
+
     public function validateTask(array $data, User $user): array
     {
         $work = Work::findOrFail($data['work_id']);

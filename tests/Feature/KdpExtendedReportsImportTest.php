@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\ImportBatch;
+use App\Models\KdpPayment;
 use App\Models\KdpReportRow;
 use App\Models\User;
 use App\Services\Kdp\KdpReportImportService;
@@ -47,6 +48,22 @@ class KdpExtendedReportsImportTest extends TestCase
             'payment_number' => 'P-COMPLETE', 'payment_method' => 'EFT', 'net_earnings' => 95,
             'sales_period_start' => '2026-07-01 00:00:00', 'sales_period_end' => '2026-07-31 00:00:00', 'source' => 'eBook sales',
         ]);
+    }
+
+    public function test_spanish_payment_report_promotes_generic_fecha_to_payment_date(): void
+    {
+        [$user, $path] = $this->file('pagos-2026-07.csv', implode("\n", [
+            'Periodo de ventas - Fecha de inicio,Periodo de ventas - Fecha final,Tienda,Número de pago,Fecha,Método de pago,Moneda,Importe del pago',
+            '2026-05-01,2026-05-31,Amazon.es,100000015517121,2026-07-29,EFT,EUR,7.18',
+        ]));
+
+        app(KdpReportImportService::class)->import($this->batch($user, $path, 'payments'));
+
+        $row = KdpReportRow::firstOrFail();
+        $payment = KdpPayment::firstOrFail();
+
+        $this->assertSame('2026-07-29', $row->payment_date?->toDateString());
+        $this->assertSame('2026-07-29', $payment->payment_date?->toDateString());
     }
 
     public function test_royalty_estimate_is_kept_out_of_final_royalties(): void

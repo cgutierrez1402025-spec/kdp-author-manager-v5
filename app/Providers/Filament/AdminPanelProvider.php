@@ -30,6 +30,7 @@ use App\Filament\Admin\Resources\Publications\PublicationResource;
 use App\Filament\Admin\Resources\Sources\SourceResource;
 use App\Filament\Admin\Resources\SourceUsages\SourceUsageResource;
 use App\Filament\Admin\Resources\Tasks\TaskResource;
+use App\Filament\Admin\Resources\TaskTypes\TaskTypeResource;
 use App\Filament\Admin\Resources\Works\WorkResource;
 use App\Filament\Admin\Widgets\ActivePromotionsWidget;
 use App\Filament\Admin\Widgets\ExpiringKdpSelectWidget;
@@ -110,6 +111,7 @@ class AdminPanelProvider extends PanelProvider
                 SourceUsageResource::class,
                 SourceResource::class,
                 TaskResource::class,
+                TaskTypeResource::class,
                 WorkResource::class,
             ])
             ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\\Filament\\Admin\\Pages')

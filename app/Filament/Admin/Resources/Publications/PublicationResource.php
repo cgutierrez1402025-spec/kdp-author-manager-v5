@@ -59,6 +59,8 @@ class PublicationResource extends Resource
             RelationManagers\KdpMetadataRelationManager::class,
             RelationManagers\PriceHistoriesRelationManager::class,
             RelationManagers\MarketObservationsRelationManager::class,
+            RelationManagers\TasksRelationManager::class,
+            RelationManagers\ChecklistsRelationManager::class,
         ];
     }
 
