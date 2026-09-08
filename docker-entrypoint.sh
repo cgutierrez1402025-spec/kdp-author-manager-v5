@@ -9,6 +9,10 @@ if [ ! -d "/app/vendor" ] || [ ! -f "/app/vendor/autoload.php" ]; then
     composer install --prefer-dist --no-interaction --ignore-platform-reqs 2>&1 | tail -10 || true
 fi
 
+# Publish Livewire assets
+echo "[ENTRYPOINT] Publishing Livewire assets..."
+php /app/artisan vendor:publish --tag=livewire:assets --force 2>&1 | tail -5 || echo "[ENTRYPOINT] Livewire publish failed, continuing..."
+
 # Cache config if artisan exists
 if [ -f "/app/artisan" ]; then
     echo "[ENTRYPOINT] Caching configuration..."

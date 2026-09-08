@@ -32,7 +32,7 @@ RUN apk add --no-cache \
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Copy composer files
-COPY composer.json ./
+COPY composer.json composer.lock ./
 
 # Install PHP dependencies (with dev for build)
 RUN composer install --prefer-dist --no-interaction --ignore-platform-reqs 2>&1 | tail -20
@@ -52,6 +52,8 @@ COPY package*.json ./
 RUN npm install
 
 COPY . .
+COPY --from=builder /app/vendor /app/vendor
+
 RUN npm run build
 
 # Final production image
@@ -67,7 +69,8 @@ RUN apk add --no-cache \
     oniguruma \
     libzip \
     icu \
-    sqlite-libs
+    sqlite-libs \
+    curl
 
 # Copy PHP configuration and extensions from builder
 COPY --from=builder /usr/local/etc /usr/local/etc

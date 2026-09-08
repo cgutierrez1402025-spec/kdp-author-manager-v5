@@ -2,10 +2,11 @@
 
 namespace App\Filament\Admin\Resources\ManuscriptVersions\Schemas;
 
-use App\Models\Language;
+use App\Models\WorkLanguage;
 use Filament\Forms;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 
 class ManuscriptVersionForm
 {
@@ -33,13 +34,16 @@ class ManuscriptVersionForm
                             }),
 
                         Forms\Components\Select::make('work_language_id')
-                            ->relationship(
-                                'workLanguage',
-                                'language_code',
-                                modifyQueryUsing: fn ($query, $get) => $query->where('work_id', $get('work_id')),
-                            )
                             ->label('Idioma')
-                            ->getOptionLabelFromRecordUsing(fn ($record): string => Language::query()->where('code', $record->language_code)->value('name') ?? $record->language_code)
+                            ->options(fn (Get $get): array => WorkLanguage::query()
+                                ->where('work_id', $get('work_id'))
+                                ->leftJoin('languages', 'languages.code', '=', 'work_languages.language_code')
+                                ->selectRaw('work_languages.id, COALESCE(languages.name, work_languages.language_code) as label')
+                                ->orderBy('languages.name')
+                                ->orderBy('work_languages.language_code')
+                                ->pluck('label', 'work_languages.id')
+                                ->all())
+                            ->searchable()
                             ->required()
                             ->live(),
 

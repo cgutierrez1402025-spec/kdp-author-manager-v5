@@ -65,6 +65,24 @@ class ComprehensiveDemoSeeder extends Seeder
                 'rating' => 5, 'reused' => false, 'generated_final_content' => true, 'result_text' => 'Una historia sobre memoria, cambio y nuevos horizontes.',
             ]);
 
+            $conversation = $this->record('ai_conversations', [
+                'user_id' => $author,
+                'work_id' => $work->id,
+                'title' => 'Asistente editorial demo',
+            ], [
+                'provider' => 'ollama',
+                'model' => 'qwen3',
+                'system_prompt' => 'Ayuda al autor con criterio editorial.',
+                'status' => 'active',
+                'last_message_at' => $now,
+            ]);
+            $this->record('ai_messages', ['ai_conversation_id' => $conversation, 'sequence' => 1], [
+                'role' => 'user', 'content' => 'Resume el enfoque editorial de esta obra.', 'status' => 'completed', 'completed_at' => $now,
+            ]);
+            $this->record('ai_messages', ['ai_conversation_id' => $conversation, 'sequence' => 2], [
+                'role' => 'assistant', 'content' => 'La obra combina memoria, cambio y nuevos horizontes.', 'status' => 'completed', 'completed_at' => $now,
+            ]);
+
             $illustration = $this->record('illustrations', ['work_id' => $work->id, 'title' => 'Mapa del mundo narrativo'], [
                 'work_language_id' => $language->id, 'description' => 'Mapa interior de demostración.', 'image_type' => 'interior',
                 'file_original' => 'demo/illustrations/mapa-original.png', 'file_optimized' => 'demo/illustrations/mapa-web.png',

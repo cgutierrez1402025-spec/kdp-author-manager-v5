@@ -6,6 +6,7 @@ use App\Filament\Admin\Resources\ManuscriptVersions\Pages\CreateManuscriptVersio
 use App\Filament\Admin\Resources\Publications\Pages\CreatePublication;
 use App\Filament\Admin\Resources\Works\Pages\CreateWork;
 use App\Models\ManuscriptVersion;
+use App\Models\Language;
 use App\Models\Marketplace;
 use App\Models\Permission;
 use App\Models\Platform;
@@ -111,5 +112,29 @@ class EditorialWorkflowTest extends TestCase
             'format' => 'ebook',
             'status' => 'draft',
         ]);
+    }
+
+    public function test_manuscript_language_options_are_loaded_from_the_selected_work_languages(): void
+    {
+        $author = User::factory()->create();
+        $role = Role::create(['name' => 'author', 'guard_name' => 'web']);
+        $author->roles()->attach($role);
+        $work = Work::factory()->create(['user_id' => $author->id]);
+
+        Language::create(['code' => 'es', 'name' => 'Español']);
+        Language::create(['code' => 'en', 'name' => 'Inglés']);
+        $spanish = $work->workLanguages()->create(['language_code' => 'es', 'translation_status' => 'original']);
+        $english = $work->workLanguages()->create(['language_code' => 'en', 'translation_status' => 'complete']);
+
+        $this->actingAs($author);
+
+        Livewire::test(CreateManuscriptVersion::class)
+            ->fillForm(['work_id' => $work->id])
+            ->assertFormFieldExists('work_language_id', function ($field) use ($spanish, $english): bool {
+                return $field->getOptions() === [
+                    $spanish->id => 'Español',
+                    $english->id => 'Inglés',
+                ];
+            });
     }
 }

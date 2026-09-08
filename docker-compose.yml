@@ -1,4 +1,21 @@
 services:
+  ollama:
+    image: ollama/ollama
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    environment:
+      - OLLAMA_HOST=0.0.0.0:11434
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - laravel
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+
   laravel:
     build:
       context: .
@@ -15,10 +32,13 @@ services:
       - QUEUE_CONNECTION=database
       - CACHE_STORE=database
       - SESSION_DRIVER=database
+      - OLLAMA_URL=http://ollama:11434
     volumes:
       - ./storage:/app/storage
       - ./bootstrap/cache:/app/bootstrap/cache
       - ./database:/app/database
+    depends_on:
+      - ollama
     restart: unless-stopped
     networks:
       - laravel
@@ -33,3 +53,5 @@ networks:
   laravel:
     driver: bridge
 
+volumes:
+  ollama_data:

@@ -2,6 +2,12 @@
 
 return [
 
+    'ollama' => [
+        'url' => env('OLLAMA_URL', 'http://host.docker.internal:11434'),
+        'timeout' => (int) env('OLLAMA_TIMEOUT', 600),
+        'default_model' => env('OLLAMA_DEFAULT_MODEL', 'qwen2.5:7b'),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Third Party Services

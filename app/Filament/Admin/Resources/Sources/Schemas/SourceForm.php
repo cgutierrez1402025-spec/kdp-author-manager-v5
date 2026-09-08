@@ -41,6 +41,7 @@ class SourceForm
                                 'article' => 'Artículo',
                                 'website' => 'Sitio Web',
                                 'interview' => 'Entrevista',
+                                'generated_ai' => 'Contenido generado por IA',
                                 'other' => 'Otro',
                             ])
                             ->required(),

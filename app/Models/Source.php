@@ -13,6 +13,7 @@ class Source extends Model
 
     protected $fillable = [
         'work_id',
+        'prompt_id',
         'title',
         'author',
         'year',
@@ -22,6 +23,9 @@ class Source extends Model
         'consulted_at',
         'citation',
         'summary',
+        'origin',
+        'generated_content',
+        'metadata',
         'rights_status',
         'license',
         'reliability',
@@ -31,11 +35,17 @@ class Source extends Model
 
     protected $casts = [
         'consulted_at' => 'date',
+        'metadata' => 'array',
     ];
 
     public function work(): BelongsTo
     {
         return $this->belongsTo(Work::class);
+    }
+
+    public function prompt(): BelongsTo
+    {
+        return $this->belongsTo(Prompt::class);
     }
 
     public function usages(): HasMany
